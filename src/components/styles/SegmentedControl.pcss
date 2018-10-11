@@ -1,0 +1,29 @@
+.base {
+  display: inline-flex;
+  flex-direction: row;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.item {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 22px;
+  font-size: 12px;
+  font-weight: bold;
+  color: $colorTextMute;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.item:hover {
+  opacity: 1;
+}
+
+.item.active {
+  background: $colorButton;
+  color: white;
+  cursor: default;
+  opacity: 1;
+}

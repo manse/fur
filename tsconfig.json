@@ -41,6 +41,6 @@
       "es2017.sharedmemory"
     ]
   },
-  "typeRoots": ["./src", "./node_modules/@types"],
-  "include": ["./src/**/*"]
+  "typeRoots": ["./src/types", "./node_modules/@types"],
+  "include": ["./src/**/*.ts", "./src/**/*.tsx", "./types/*"]
 }

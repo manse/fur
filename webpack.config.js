@@ -95,7 +95,9 @@ const rules = [
         loader: 'postcss-loader',
         options: {
           plugins: _ => [
-            require('postcss-simple-vars')(),
+            require('postcss-simple-vars')({
+              variables: require('./src/styles/constant.js')
+            }),
             require('postcss-color-function')(),
             require('postcss-calc')(),
             require('postcss-nested')(),
