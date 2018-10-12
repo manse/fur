@@ -7,6 +7,8 @@ import './styles/Button.pcss';
 
 type Props = {
   icon: 'download' | 'folder' | 'plus' | 'refresh' | 'trash';
+  disabled?: boolean;
+  onClick: () => any;
 };
 
 const icons = {
@@ -17,10 +19,10 @@ const icons = {
   trash
 };
 
-export const Button = ({ icon }: Props) => {
+export const Button = ({ icon, disabled, onClick }: Props) => {
   const Icon = (icons as any)[icon];
   return (
-    <button styleName="base">
+    <button styleName="base" onClick={onClick} disabled={disabled}>
       <Icon />
     </button>
   );

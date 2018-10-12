@@ -1,8 +1,6 @@
 .base {
   display: inline-flex;
   flex-direction: row;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
-  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -15,6 +13,19 @@
   color: $colorTextMute;
   cursor: pointer;
   opacity: 0.7;
+  border-width: 1px 0;
+  border-style: solid;
+  border-color: $colorBorder;
+}
+
+.item:first-child {
+  border-left-width: 1px;
+  border-radius: 6px 0 0 6px;
+}
+
+.item:last-child {
+  border-right-width: 1px;
+  border-radius: 0 6px 6px 0;
 }
 
 .item:hover {
@@ -23,6 +34,7 @@
 
 .item.active {
   background: $colorButton;
+  border-color: $colorButton;
   color: white;
   cursor: default;
   opacity: 1;

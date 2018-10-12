@@ -9,7 +9,9 @@ type Props = {
 export const SegmentedControl = ({ items, selectedIndex }: Props) => (
   <div styleName="base">
     {items.map((item, index) => (
-      <div styleName={`item ${selectedIndex === index ? 'active' : ''}`}>{item}</div>
+      <div key={item} styleName={`item ${selectedIndex === index ? 'active' : ''}`}>
+        {item}
+      </div>
     ))}
   </div>
 );

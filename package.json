@@ -9,6 +9,7 @@
   "author": "manse",
   "license": "ISC",
   "dependencies": {
+    "color-convert": "^1.9.3",
     "mobx": "4",
     "mobx-react": "^5.2.3",
     "ramda": "^0.25.0",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.54",
     "@babel/preset-env": "^7.0.0-beta.54",
+    "@types/color-convert": "^1.9.0",
     "@types/ramda": "^0.25.34",
     "@types/react-css-modules": "^4.6.1",
     "@types/react-dom": "^16.0.6",

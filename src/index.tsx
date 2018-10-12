@@ -1,4 +1,4 @@
-import { Provider } from 'mobx-react';
+import { observer, Provider } from 'mobx-react';
 import { render } from 'react-dom';
 import { Button } from './components/Button';
 import { Layout } from './components/Layout';
@@ -9,14 +9,36 @@ import { Toolbar } from './components/Toolbar';
 import stores from './stores';
 import './styles/app.pcss';
 
-const App = () => (
+const App = observer(() => (
   <Provider {...stores}>
     <Layout>
       <Pane position="sidebar">
         <PartList />
         <Toolbar
-          leftItems={[<Button icon="folder" />, <Button icon="plus" />, <Button icon="trash" />]}
-          rightItems={[<Button icon="refresh" />, <Button icon="download" />]}
+          leftItems={[
+            <Button key={1} icon="folder" onClick={() => {}} />,
+            <Button key={2} icon="plus" onClick={() => stores.applicationStore.addPartStore()} />,
+            <Button
+              key={3}
+              icon="trash"
+              disabled={!stores.applicationStore.activePartStore}
+              onClick={() => stores.applicationStore.removeActivePartStore()}
+            />
+          ]}
+          rightItems={[
+            <Button
+              key={1}
+              icon="refresh"
+              disabled={!stores.applicationStore.activePartStore}
+              onClick={() => stores.applicationStore.refreshActivePartStore()}
+            />,
+            <Button
+              key={2}
+              icon="download"
+              disabled={!stores.applicationStore.activePartStore}
+              onClick={() => stores.applicationStore.saveActivePartStoreAsImage()}
+            />
+          ]}
         />
       </Pane>
       <Pane position="body">
@@ -26,6 +48,6 @@ const App = () => (
       </Pane>
     </Layout>
   </Provider>
-);
+));
 
 render(<App />, document.querySelector('#app'));
