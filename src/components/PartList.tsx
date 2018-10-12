@@ -1,21 +1,21 @@
 import { inject, observer } from 'mobx-react';
-import { ApplicationStore } from '../stores/ApplicationStore';
+import { PartManagerStore } from '../stores/PartManagerStore';
 import { PartListItem } from './PartListItem';
 import './styles/PartList.pcss';
 
 type Props = {
-  applicationStore?: ApplicationStore;
+  partManagerStore?: PartManagerStore;
 };
 
-export const PartList = inject('applicationStore')(
-  observer(({ applicationStore }: Props) => (
+export const PartList = inject('partManagerStore')(
+  observer(({ partManagerStore }: Props) => (
     <div styleName="base">
-      {applicationStore.partStores.map(partStore => (
+      {partManagerStore.partStores.map(partStore => (
         <PartListItem
           partStore={partStore}
-          active={partStore === applicationStore.activePartStore}
+          active={partStore === partManagerStore.activePartStore}
           key={partStore.id}
-          onClick={() => applicationStore.setActivePartStore(partStore)}
+          onClick={() => partManagerStore.setActivePartStore(partStore)}
         />
       ))}
     </div>

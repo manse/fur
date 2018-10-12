@@ -1,7 +1,7 @@
 import { observable } from 'mobx';
 import { PartStore } from './PartStore';
 
-export class ApplicationStore {
+export class PartManagerStore {
   @observable
   public partStores: PartStore[] = [];
   @observable

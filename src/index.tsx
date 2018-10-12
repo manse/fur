@@ -17,26 +17,26 @@ const App = observer(() => (
         <Toolbar
           leftItems={[
             <Button key={1} icon="folder" onClick={() => {}} />,
-            <Button key={2} icon="plus" onClick={() => stores.applicationStore.addPartStore()} />,
+            <Button key={2} icon="plus" onClick={() => stores.partManagerStore.addPartStore()} />,
             <Button
               key={3}
               icon="trash"
-              disabled={!stores.applicationStore.activePartStore}
-              onClick={() => stores.applicationStore.removeActivePartStore()}
+              disabled={!stores.partManagerStore.activePartStore}
+              onClick={() => stores.partManagerStore.removeActivePartStore()}
             />
           ]}
           rightItems={[
             <Button
               key={1}
               icon="refresh"
-              disabled={!stores.applicationStore.activePartStore}
-              onClick={() => stores.applicationStore.refreshActivePartStore()}
+              disabled={!stores.partManagerStore.activePartStore}
+              onClick={() => stores.partManagerStore.refreshActivePartStore()}
             />,
             <Button
               key={2}
               icon="download"
-              disabled={!stores.applicationStore.activePartStore}
-              onClick={() => stores.applicationStore.saveActivePartStoreAsImage()}
+              disabled={!stores.partManagerStore.activePartStore}
+              onClick={() => stores.partManagerStore.saveActivePartStoreAsImage()}
             />
           ]}
         />

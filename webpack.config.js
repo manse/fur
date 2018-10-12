@@ -100,6 +100,7 @@ const rules = [
             }),
             require('postcss-color-function')(),
             require('postcss-calc')(),
+            require('postcss-cssnext')(),
             require('postcss-nested')(),
             require('postcss-preset-env')()
           ]

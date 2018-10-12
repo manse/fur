@@ -10,9 +10,8 @@
   padding: 0 22px;
   font-size: 12px;
   font-weight: bold;
-  color: $colorTextMute;
   cursor: pointer;
-  opacity: 0.7;
+  color: color($colorTextMute alpha(80%));
   border-width: 1px 0;
   border-style: solid;
   border-color: $colorBorder;
@@ -30,6 +29,8 @@
 
 .item:hover {
   opacity: 1;
+  color: color($colorButton alpha(50%));
+  background: color($colorFill alpha(50%));
 }
 
 .item.active {
