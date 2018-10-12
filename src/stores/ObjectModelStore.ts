@@ -1,9 +1,9 @@
 import { observable } from 'mobx';
 import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
+import { Point2D } from '../utils/vo';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { VertexStore } from './VertexStore';
-import { Point2D } from './vo';
 
 export const M_PI_2 = Math.PI / 2;
 
@@ -19,6 +19,8 @@ export class ObjectModelStore {
   };
   @observable
   public scale = 100;
+  @observable
+  public key = 0;
 
   public getFragmentAtPoint(p: Point2D) {
     const frags = this.fragmentStores.filter(f => f.testIntersection(p));
@@ -38,12 +40,14 @@ export class ObjectModelStore {
     if (this.camera.x < -M_PI_2) this.camera.x = -M_PI_2;
     else if (this.camera.x > M_PI_2) this.camera.x = M_PI_2;
     this.updateProjection();
+    this.invalidate();
   }
 
   public setScale(scale: number) {
-    this.scale += scale;
+    this.scale = scale;
     if (this.scale < 1) this.scale = 1;
     this.updateProjection();
+    this.invalidate();
   }
 
   public loadModelFromObjString(obj: string) {
@@ -78,6 +82,11 @@ export class ObjectModelStore {
     });
     this.verticeStores = [...this.verticeStores, ...quadCenterVertices];
     this.updateProjection();
+    this.invalidate();
+  }
+
+  public invalidate() {
+    this.key++;
   }
 
   private updateProjection() {

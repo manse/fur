@@ -1,5 +1,5 @@
+import { Point2D } from '../utils/vo';
 import { VertexStore } from './VertexStore';
-import { Point2D } from './vo';
 
 export class EdgeStore {
   constructor(public v0: VertexStore, public v1: VertexStore) {}

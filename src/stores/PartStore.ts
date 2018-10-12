@@ -16,4 +16,36 @@ export class PartStore {
   public fragmentStores: FragmentStore[] = [];
   @observable
   public edgeStores: EdgeStore[] = [];
+
+  public includesFragmentStore(fragment: FragmentStore) {
+    return this.fragmentStores.indexOf(fragment) !== -1;
+  }
+
+  public indexOfEdgeStore(edge: EdgeStore) {
+    return this.edgeStores.findIndex(e => e.equals(edge));
+  }
+
+  public includesEdge(dart: EdgeStore) {
+    return this.indexOfEdgeStore(dart) !== -1;
+  }
+
+  public addFragment(fragment: FragmentStore) {
+    if (this.includesFragmentStore(fragment)) return;
+    this.fragmentStores.push(fragment);
+  }
+
+  public removeFragment(fragment: FragmentStore) {
+    this.fragmentStores = this.fragmentStores.filter(f => fragment !== f);
+  }
+
+  public addEdge(edge: EdgeStore) {
+    if (this.includesEdge(edge)) return;
+    this.edgeStores.push(edge);
+  }
+
+  public removeEdge(edge: EdgeStore) {
+    const index = this.indexOfEdgeStore(edge);
+    if (index === -1) return;
+    this.edgeStores.splice(index, 1);
+  }
 }

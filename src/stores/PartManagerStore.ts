@@ -1,4 +1,5 @@
 import { observable } from 'mobx';
+import { FragmentStore } from './FragmentStore';
 import { PartStore } from './PartStore';
 
 export class PartManagerStore {
@@ -32,5 +33,9 @@ export class PartManagerStore {
 
   public saveActivePartStoreAsImage() {
     if (!this.activePartStore) return;
+  }
+
+  public filterPartStoresByFragment(fragment: FragmentStore) {
+    return this.partStores.filter(part => part.includesFragmentStore(fragment));
   }
 }

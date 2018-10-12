@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { project } from '../utils/m4';
-import { Point3D } from './vo';
+import { Point3D } from '../utils/vo';
 
 export class VertexStore {
   @observable

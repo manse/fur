@@ -1,6 +1,6 @@
+import { Point2D } from '../utils/vo';
 import { EdgeStore } from './EdgeStore';
 import { VertexStore } from './VertexStore';
-import { Point2D } from './vo';
 
 function sign(p1: Point2D, p2: Point2D, p3: Point2D) {
   return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);

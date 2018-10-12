@@ -2,6 +2,7 @@ import { observer, Provider } from 'mobx-react';
 import { render } from 'react-dom';
 import { Button } from './components/Button';
 import { Layout } from './components/Layout';
+import { ModelRenderer } from './components/ModelRenderer';
 import { Pane } from './components/Pane';
 import { PartList } from './components/PartList';
 import { SegmentedControl } from './components/SegmentedControl';
@@ -12,6 +13,12 @@ import './styles/app.pcss';
 const App = observer(() => (
   <Provider {...stores}>
     <Layout>
+      <Pane position="body">
+        <ModelRenderer />
+        <div styleName="display-switch">
+          <SegmentedControl items={['Model', 'Pattern']} selectedIndex={0} onClickItem={() => {}} />
+        </div>
+      </Pane>
       <Pane position="sidebar">
         <PartList />
         <Toolbar
@@ -40,11 +47,6 @@ const App = observer(() => (
             />
           ]}
         />
-      </Pane>
-      <Pane position="body">
-        <div styleName="display-switch">
-          <SegmentedControl items={['Model', 'Pattern']} selectedIndex={0} onClickItem={() => {}} />
-        </div>
       </Pane>
     </Layout>
   </Provider>

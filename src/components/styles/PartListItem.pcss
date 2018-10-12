@@ -1,8 +1,18 @@
 .base {
   border-bottom: 1px solid $colorBorder;
-  border-left: 6px solid gray;
   height: 300px;
   cursor: pointer;
+  position: relative;
+}
+
+.color {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 99em;
+  z-index: 1;
 }
 
 .base.active {
