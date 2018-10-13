@@ -13,22 +13,17 @@ export const M_PI_2 = Math.PI / 2;
 
 export class ModelStore {
   @observable
-  public verticeStores: VertexStore[] = [];
-  @observable
-  public fragmentStores: FragmentStore[] = [];
-  @observable
-  public camera: Point2D = {
-    x: 0,
-    y: 0
-  };
-  @observable
-  public scale = 100;
-  @observable
   public key = 0;
   @observable
   public controller: IController;
 
-  private dragging = false;
+  public verticeStores: VertexStore[] = [];
+  public fragmentStores: FragmentStore[] = [];
+  public camera: Point2D = {
+    x: 0,
+    y: 0
+  };
+  public scale = 100;
   private partManagerStore: PartManagerStore;
 
   constructor({ partManagerStore }: { partManagerStore: PartManagerStore }) {
@@ -68,35 +63,13 @@ export class ModelStore {
     this.key++;
   }
 
-  public handleMousedown(point: Point2D) {
-    this.controller.start(point);
-    this.dragging = true;
-    this.invalidate();
-  }
-
-  public handleMousemove(point: Point2D) {
-    this.controller.update(point);
-    this.invalidate();
-  }
-
-  public handleMouseup(point: Point2D) {
-    this.controller.finish(point);
-    this.dragging = false;
-    this.invalidate();
-  }
-
-  public handleMousewheel(delta: number) {
-    this.controller.scroll(delta);
-    this.invalidate();
-  }
-
   public handleKeyboard(e: KeyboardEvent) {
-    if (this.dragging) return;
     const shift = e.shiftKey;
     const ctrl = e.metaKey || e.ctrlKey;
-    const alt = e.altKey;
-    if (alt) {
+    const key = String.fromCharCode(e.which);
+    if (key === 'A') {
       this.setController(ControllerType.multipleFragment);
+    } else if (key === 'Z') {
     } else if (shift) {
       this.setController(ControllerType.fragment);
     } else if (ctrl) {

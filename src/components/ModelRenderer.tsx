@@ -10,26 +10,36 @@ type Props = {
   partManagerStore?: PartManagerStore;
 };
 
+function handleEvent(canvas: HTMLCanvasElement, { modelStore }: Props) {
+  (canvas as any).onmousewheel = (e: MouseWheelEvent) => modelStore.controller.scroll(e.wheelDelta);
+  canvas.onmousedown = e => {
+    const controller = modelStore.controller;
+    controller.start({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
+    const mousemove = (e: MouseEvent) => {
+      controller.update({
+        x: e.x - canvas.width / 2,
+        y: e.y - canvas.height / 2
+      });
+    };
+    const mouseup = (e: MouseEvent) => {
+      controller.finish({
+        x: e.x - canvas.width / 2,
+        y: e.y - canvas.height / 2
+      });
+      window.removeEventListener('mousemove', mousemove);
+      window.removeEventListener('mouseup', mouseup);
+    };
+    window.addEventListener('mousemove', mousemove);
+    window.addEventListener('mouseup', mouseup);
+  };
+}
+
 function render(canvas: HTMLCanvasElement, { modelStore, partManagerStore }: Props) {
   canvas.width = (canvas.parentNode as any).offsetWidth;
   canvas.height = (canvas.parentNode as any).offsetHeight;
-
-  (canvas as any).onmousewheel = (e: MouseWheelEvent) => modelStore.handleMousewheel(e.wheelDelta);
-  canvas.onmousedown = e =>
-    modelStore.handleMousedown({
-      x: e.x - canvas.width / 2,
-      y: e.y - canvas.height / 2
-    });
-  canvas.onmousemove = e =>
-    modelStore.handleMousemove({
-      x: e.x - canvas.width / 2,
-      y: e.y - canvas.height / 2
-    });
-  canvas.onmouseup = e =>
-    modelStore.handleMouseup({
-      x: e.x - canvas.width / 2,
-      y: e.y - canvas.height / 2
-    });
 
   const context = canvas.getContext('2d');
   context.save();
@@ -93,6 +103,16 @@ export class ModelRenderer extends Component<Props> {
   };
 
   public render() {
-    return <canvas key={this.props.modelStore.key} ref={canvas => canvas && render(canvas, this.props)} />;
+    return (
+      <canvas
+        key={this.props.modelStore.key}
+        ref={canvas => {
+          if (canvas) {
+            render(canvas, this.props);
+            handleEvent(canvas, this.props);
+          }
+        }}
+      />
+    );
   }
 }
