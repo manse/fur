@@ -1,19 +1,27 @@
-import stores from '..';
 import { Point2D } from '../../utils/vo';
 import { FragmentStore } from '../FragmentStore';
-import { IController } from './IController';
+import { ModelStore } from '../ModelStore';
+import { PartManagerStore } from '../PartManagerStore';
+import { ControllerType, IController } from './IController';
+
+type Stores = {
+  modelStore: ModelStore;
+  partManagerStore: PartManagerStore;
+};
 
 export class FragmentController implements IController {
   private dragging = false;
   private hoverFragment: FragmentStore;
   private toRemove = false;
 
+  constructor(private stores: Stores) {}
+
   public start(point: Point2D) {
     this.dragging = true;
-    const fragment = stores.objectModelStore.getFragmentAtPoint(point);
+    const fragment = this.stores.modelStore.getFragmentAtPoint(point);
     this.toRemove =
-      stores.partManagerStore.activePartStore &&
-      stores.partManagerStore.activePartStore.includesFragmentStore(fragment);
+      this.stores.partManagerStore.activePartStore &&
+      this.stores.partManagerStore.activePartStore.includesFragmentStore(fragment);
     this.evaluate(point);
   }
 
@@ -21,12 +29,12 @@ export class FragmentController implements IController {
     if (this.dragging) {
       this.evaluate(point);
     } else {
-      this.hoverFragment = stores.objectModelStore.getFragmentAtPoint(point);
+      this.hoverFragment = this.stores.modelStore.getFragmentAtPoint(point);
     }
   }
 
   public finish(_: Point2D) {
-    stores.objectModelStore.resetController();
+    this.stores.modelStore.resetController();
   }
 
   public scroll(_: number) {}
@@ -42,10 +50,14 @@ export class FragmentController implements IController {
     context.fill();
   }
 
+  public get type() {
+    return ControllerType.fragment;
+  }
+
   private evaluate(point: Point2D) {
-    const fragment = stores.objectModelStore.getFragmentAtPoint(point);
+    const fragment = this.stores.modelStore.getFragmentAtPoint(point);
     if (!fragment) return;
-    const partStore = stores.partManagerStore.activePartStore;
+    const partStore = this.stores.partManagerStore.activePartStore;
     if (!partStore) return;
     if (this.toRemove) {
       partStore.removeFragment(fragment);

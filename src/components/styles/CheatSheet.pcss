@@ -1,0 +1,49 @@
+.base {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  font-size: 12px;
+  color: #bbb;
+  user-select: none;
+  pointer-events: none;
+
+  h1 {
+    margin: 15px 0;
+  }
+
+  dl,
+  dt,
+  dd {
+    padding: 0;
+    margin: 0;
+  }
+
+  dl {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  dt {
+    background: $colorFill;
+    color: #aaa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid $colorBorder;
+  }
+
+  dd {
+    margin-left: 8px;
+  }
+
+  .active {
+    dt {
+      color: rgba(255, 255, 255, 0.8);
+      background: $colorButton;
+      border-color: $colorButton;
+    }
+    dd {
+      color: #555;
+    }
+  }
+}

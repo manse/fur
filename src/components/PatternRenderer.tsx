@@ -1,24 +1,14 @@
 import { inject, observer } from 'mobx-react';
-import { SIDEBAR_WIDTH } from '../constrants/Layout';
-import { ObjectModelStore } from '../stores/ObjectModelStore';
+import { ModelStore } from '../stores/ModelStore';
 import { PartManagerStore } from '../stores/PartManagerStore';
-import { WindowStore } from '../stores/WindowStore';
 
 type Props = {
-  windowStore?: WindowStore;
-  objectModelStore?: ObjectModelStore;
+  modelStore?: ModelStore;
   partManagerStore?: PartManagerStore;
 };
 
-export const PatternRenderer = inject('windowStore', 'objectModelStore', 'partManagerStore')(
+export const PatternRenderer = inject('modelStore', 'partManagerStore')(
   observer((props: Props) => {
-    return (
-      <canvas
-        key={props.objectModelStore.key}
-        width={props.windowStore.width - SIDEBAR_WIDTH}
-        height={props.windowStore.height}
-        ref={canvas => canvas}
-      />
-    );
+    return <canvas key={props.modelStore.key} ref={canvas => canvas} />;
   })
 );

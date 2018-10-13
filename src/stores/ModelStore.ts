@@ -3,21 +3,15 @@ import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
 import { Point2D } from '../utils/vo';
 import { DefaultController } from './controllers/DefaultController';
 import { FragmentController } from './controllers/FragmentController';
-import { IController } from './controllers/IController';
+import { ControllerType, IController } from './controllers/IController';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
+import { PartManagerStore } from './PartManagerStore';
 import { VertexStore } from './VertexStore';
 
 export const M_PI_2 = Math.PI / 2;
 
-enum ControllerType {
-  default,
-  fragment,
-  edge,
-  multipleFragment
-}
-
-export class ObjectModelStore {
+export class ModelStore {
   @observable
   public verticeStores: VertexStore[] = [];
   @observable
@@ -31,10 +25,16 @@ export class ObjectModelStore {
   public scale = 100;
   @observable
   public key = 0;
-
-  public controller: IController = new DefaultController();
+  @observable
+  public controller: IController;
 
   private dragging = false;
+  private partManagerStore: PartManagerStore;
+
+  constructor({ partManagerStore }: { partManagerStore: PartManagerStore }) {
+    this.partManagerStore = partManagerStore;
+    this.resetController();
+  }
 
   public getFragmentAtPoint(p: Point2D) {
     const frags = this.fragmentStores.filter(f => f.testIntersection(p));
@@ -92,13 +92,14 @@ export class ObjectModelStore {
 
   public handleKeyboard(e: KeyboardEvent) {
     if (this.dragging) return;
+    const shift = e.shiftKey;
     const ctrl = e.metaKey || e.ctrlKey;
     const alt = e.altKey;
-    if (ctrl && alt) {
+    if (alt) {
       this.setController(ControllerType.multipleFragment);
-    } else if (ctrl) {
+    } else if (shift) {
       this.setController(ControllerType.fragment);
-    } else if (alt) {
+    } else if (ctrl) {
       this.setController(ControllerType.edge);
     } else {
       this.setController(ControllerType.default);
@@ -108,10 +109,15 @@ export class ObjectModelStore {
   public setController(type: ControllerType) {
     switch (type) {
       case ControllerType.default:
-        this.controller = new DefaultController();
+        this.controller = new DefaultController({
+          modelStore: this
+        });
         break;
       case ControllerType.fragment:
-        this.controller = new FragmentController();
+        this.controller = new FragmentController({
+          modelStore: this,
+          partManagerStore: this.partManagerStore
+        });
         break;
       default:
         return;

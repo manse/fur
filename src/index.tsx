@@ -1,6 +1,7 @@
 import { observer, Provider } from 'mobx-react';
 import { render } from 'react-dom';
 import { Button } from './components/Button';
+import { CheatSheet } from './components/CheatSheet';
 import { Layout } from './components/Layout';
 import { ModelRenderer } from './components/ModelRenderer';
 import { Pane } from './components/Pane';
@@ -18,6 +19,7 @@ const App = observer(() => (
       <Pane position="body">
         {stores.editorStore.editorTab === EditorTab.model ? <ModelRenderer /> : null}
         {stores.editorStore.editorTab === EditorTab.pattern ? <PatternRenderer /> : null}
+        <CheatSheet />
         <div styleName="display-switch">
           <SegmentedControl
             items={['Model', 'Pattern']}

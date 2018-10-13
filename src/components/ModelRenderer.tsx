@@ -1,31 +1,32 @@
 import { inject, observer } from 'mobx-react';
-import { SIDEBAR_WIDTH } from '../constrants/Layout';
+import { Component } from 'react';
 import { EdgeStore } from '../stores/EdgeStore';
-import { ObjectModelStore } from '../stores/ObjectModelStore';
+import { ModelStore } from '../stores/ModelStore';
 import { PartManagerStore } from '../stores/PartManagerStore';
-import { WindowStore } from '../stores/WindowStore';
 import { ligten, toRGBA } from '../utils/color';
 
 type Props = {
-  windowStore?: WindowStore;
-  objectModelStore?: ObjectModelStore;
+  modelStore?: ModelStore;
   partManagerStore?: PartManagerStore;
 };
 
-function render(canvas: HTMLCanvasElement, { objectModelStore, partManagerStore }: Props) {
-  (canvas as any).onmousewheel = (e: MouseWheelEvent) => objectModelStore.handleMousewheel(e.wheelDelta);
+function render(canvas: HTMLCanvasElement, { modelStore, partManagerStore }: Props) {
+  canvas.width = (canvas.parentNode as any).offsetWidth;
+  canvas.height = (canvas.parentNode as any).offsetHeight;
+
+  (canvas as any).onmousewheel = (e: MouseWheelEvent) => modelStore.handleMousewheel(e.wheelDelta);
   canvas.onmousedown = e =>
-    objectModelStore.handleMousedown({
+    modelStore.handleMousedown({
       x: e.x - canvas.width / 2,
       y: e.y - canvas.height / 2
     });
   canvas.onmousemove = e =>
-    objectModelStore.handleMousemove({
+    modelStore.handleMousemove({
       x: e.x - canvas.width / 2,
       y: e.y - canvas.height / 2
     });
   canvas.onmouseup = e =>
-    objectModelStore.handleMouseup({
+    modelStore.handleMouseup({
       x: e.x - canvas.width / 2,
       y: e.y - canvas.height / 2
     });
@@ -37,7 +38,7 @@ function render(canvas: HTMLCanvasElement, { objectModelStore, partManagerStore 
   const clockwiseEdges: EdgeStore[] = [];
 
   // fragments
-  objectModelStore.fragmentStores.forEach(fragment => {
+  modelStore.fragmentStores.forEach(fragment => {
     const partStores = partManagerStore.filterPartStoresByFragment(fragment);
     const clockwise = fragment.isClockwise();
     context.lineWidth = 0.15;
@@ -71,20 +72,27 @@ function render(canvas: HTMLCanvasElement, { objectModelStore, partManagerStore 
   });
 
   // optional rendering
-  objectModelStore.controller.render(context);
+  modelStore.controller.render(context);
 
   context.restore();
 }
 
-export const ModelRenderer = inject('windowStore', 'objectModelStore', 'partManagerStore')(
-  observer((props: Props) => {
-    return (
-      <canvas
-        key={props.objectModelStore.key}
-        width={props.windowStore.width - SIDEBAR_WIDTH}
-        height={props.windowStore.height}
-        ref={canvas => canvas && render(canvas, props)}
-      />
-    );
-  })
-);
+@inject('modelStore', 'partManagerStore')
+@observer
+export class ModelRenderer extends Component<Props> {
+  public componentDidMount() {
+    window.addEventListener('resize', this.invalidate);
+  }
+
+  public componentWillUnmount() {
+    window.removeEventListener('resize', this.invalidate);
+  }
+
+  private invalidate = () => {
+    this.props.modelStore.invalidate();
+  };
+
+  public render() {
+    return <canvas key={this.props.modelStore.key} ref={canvas => canvas && render(canvas, this.props)} />;
+  }
+}

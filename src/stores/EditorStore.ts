@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import stores from '.';
+import { ModelStore } from './ModelStore';
 
 export enum EditorTab {
   model,
@@ -12,15 +12,15 @@ export class EditorStore {
   @observable
   public editorTab = EditorTab.model;
 
-  constructor() {
+  constructor({ modelStore }: { modelStore: ModelStore }) {
     window.addEventListener('keydown', e => {
       if (this.editorTab === EditorTab.model) {
-        stores.objectModelStore.handleKeyboard(e);
+        modelStore.handleKeyboard(e);
       }
     });
     window.addEventListener('keyup', e => {
       if (this.editorTab === EditorTab.model) {
-        stores.objectModelStore.handleKeyboard(e);
+        modelStore.handleKeyboard(e);
       }
     });
   }
