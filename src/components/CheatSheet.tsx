@@ -1,7 +1,6 @@
 import { inject, observer } from 'mobx-react';
-import { ControllerType } from '../stores/controllers/IController';
 import { EditorStore, EditorTab } from '../stores/EditorStore';
-import { ModelStore } from '../stores/ModelStore';
+import { ControllerType, ModelStore } from '../stores/ModelStore';
 import './styles/CheatSheet.pcss';
 
 type Props = {
@@ -23,11 +22,11 @@ export const CheatSheet = inject('editorStore', 'modelStore')(
             <dt>Shift + Click</dt>
             <dd>Pick or unpick fragment</dd>
           </dl>
-          <dl styleName={modelStore.controller.type === ControllerType.multipleFragment ? 'active' : ''}>
+          <dl styleName={modelStore.controller.type === ControllerType.multipleFragmentAdd ? 'active' : ''}>
             <dt>Shift + A + Click</dt>
             <dd>Pick multiple fragment</dd>
           </dl>
-          <dl>
+          <dl styleName={modelStore.controller.type === ControllerType.multipleFragmentRemove ? 'active' : ''}>
             <dt>Shift + Z + Click</dt>
             <dd>Unpick multiple fragment</dd>
           </dl>

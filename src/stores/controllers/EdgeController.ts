@@ -8,16 +8,10 @@ type Stores = {
   partManagerStore: PartManagerStore;
 };
 
-export class FragmentController implements IController {
-  private toRemove = false;
-
+export class EdgeController implements IController {
   constructor(private stores: Stores) {}
 
   public start(point: Point2D) {
-    const fragment = this.stores.modelStore.getFragmentAtPoint(point);
-    this.toRemove =
-      this.stores.partManagerStore.activePartStore &&
-      this.stores.partManagerStore.activePartStore.includesFragmentStore(fragment);
     this.evaluate(point);
   }
 
@@ -32,18 +26,18 @@ export class FragmentController implements IController {
   public render(_: CanvasRenderingContext2D) {}
 
   public get type() {
-    return ControllerType.fragment;
+    return ControllerType.edge;
   }
 
   private evaluate(point: Point2D) {
-    const fragment = this.stores.modelStore.getFragmentAtPoint(point);
-    if (!fragment) return;
+    const edge = this.stores.modelStore.getNearestEdgeAtPoint(point);
+    if (!edge) return;
     const partStore = this.stores.partManagerStore.activePartStore;
     if (!partStore) return;
-    if (this.toRemove) {
-      partStore.removeFragment(fragment);
+    if (partStore.includesEdge(edge)) {
+      partStore.removeEdge(edge);
     } else {
-      partStore.addFragment(fragment);
+      partStore.addEdge(edge);
     }
     this.stores.modelStore.invalidate();
   }

@@ -1,11 +1,6 @@
 import { Point2D } from '../../utils/vo';
+import { ControllerType } from '../ModelStore';
 
-export enum ControllerType {
-  default,
-  fragment,
-  edge,
-  multipleFragment
-}
 export interface IController {
   start(p: Point2D): void;
   update(p: Point2D): void;

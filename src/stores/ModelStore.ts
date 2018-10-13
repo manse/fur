@@ -2,14 +2,24 @@ import { observable } from 'mobx';
 import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
 import { Point2D } from '../utils/vo';
 import { DefaultController } from './controllers/DefaultController';
+import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import { ControllerType, IController } from './controllers/IController';
+import { IController } from './controllers/IController';
+import { MultipleFragmentController, MultipleFragmentControllerMode } from './controllers/MultipleFragmentController';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { PartManagerStore } from './PartManagerStore';
 import { VertexStore } from './VertexStore';
 
 export const M_PI_2 = Math.PI / 2;
+
+export enum ControllerType {
+  default,
+  fragment,
+  edge,
+  multipleFragmentAdd,
+  multipleFragmentRemove
+}
 
 export class ModelStore {
   @observable
@@ -66,10 +76,11 @@ export class ModelStore {
   public handleKeyboard(e: KeyboardEvent) {
     const shift = e.shiftKey;
     const ctrl = e.metaKey || e.ctrlKey;
-    const key = String.fromCharCode(e.which);
+    const key = e.type === 'keyup' ? '' : String.fromCharCode(e.which);
     if (key === 'A') {
-      this.setController(ControllerType.multipleFragment);
+      this.setController(ControllerType.multipleFragmentAdd);
     } else if (key === 'Z') {
+      this.setController(ControllerType.multipleFragmentRemove);
     } else if (shift) {
       this.setController(ControllerType.fragment);
     } else if (ctrl) {
@@ -80,17 +91,25 @@ export class ModelStore {
   }
 
   public setController(type: ControllerType) {
+    const stores = {
+      modelStore: this,
+      partManagerStore: this.partManagerStore
+    };
     switch (type) {
       case ControllerType.default:
-        this.controller = new DefaultController({
-          modelStore: this
-        });
+        this.controller = new DefaultController(stores);
         break;
       case ControllerType.fragment:
-        this.controller = new FragmentController({
-          modelStore: this,
-          partManagerStore: this.partManagerStore
-        });
+        this.controller = new FragmentController(stores);
+        break;
+      case ControllerType.edge:
+        this.controller = new EdgeController(stores);
+        break;
+      case ControllerType.multipleFragmentAdd:
+        this.controller = new MultipleFragmentController(stores, MultipleFragmentControllerMode.add);
+        break;
+      case ControllerType.multipleFragmentRemove:
+        this.controller = new MultipleFragmentController(stores, MultipleFragmentControllerMode.remove);
         break;
       default:
         return;

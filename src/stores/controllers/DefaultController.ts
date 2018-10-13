@@ -1,6 +1,6 @@
 import { Point2D } from '../../utils/vo';
-import { ModelStore } from '../ModelStore';
-import { ControllerType, IController } from './IController';
+import { ControllerType, ModelStore } from '../ModelStore';
+import { IController } from './IController';
 
 type Stores = {
   modelStore: ModelStore;
