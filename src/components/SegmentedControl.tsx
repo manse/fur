@@ -6,10 +6,10 @@ type Props = {
   onClickItem: (i: number) => any;
 };
 
-export const SegmentedControl = ({ items, selectedIndex }: Props) => (
+export const SegmentedControl = ({ items, selectedIndex, onClickItem }: Props) => (
   <div styleName="base">
     {items.map((item, index) => (
-      <div key={item} styleName={`item ${selectedIndex === index ? 'active' : ''}`}>
+      <div key={item} styleName={`item ${selectedIndex === index ? 'active' : ''}`} onClick={() => onClickItem(index)}>
         {item}
       </div>
     ))}

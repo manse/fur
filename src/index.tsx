@@ -5,18 +5,27 @@ import { Layout } from './components/Layout';
 import { ModelRenderer } from './components/ModelRenderer';
 import { Pane } from './components/Pane';
 import { PartList } from './components/PartList';
+import { PatternRenderer } from './components/PatternRenderer';
 import { SegmentedControl } from './components/SegmentedControl';
 import { Toolbar } from './components/Toolbar';
 import stores from './stores';
+import { EditorTab, EditorTabList } from './stores/EditorStore';
 import './styles/app.pcss';
 
 const App = observer(() => (
   <Provider {...stores}>
     <Layout>
       <Pane position="body">
-        <ModelRenderer />
+        {stores.editorStore.editorTab === EditorTab.model ? <ModelRenderer /> : null}
+        {stores.editorStore.editorTab === EditorTab.pattern ? <PatternRenderer /> : null}
         <div styleName="display-switch">
-          <SegmentedControl items={['Model', 'Pattern']} selectedIndex={0} onClickItem={() => {}} />
+          <SegmentedControl
+            items={['Model', 'Pattern']}
+            selectedIndex={EditorTabList.indexOf(stores.editorStore.editorTab)}
+            onClickItem={i => {
+              stores.editorStore.setEditorTab(EditorTabList[i]);
+            }}
+          />
         </div>
       </Pane>
       <Pane position="sidebar">

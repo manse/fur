@@ -9,7 +9,7 @@ type Props = {
 
 export const PartListItem = ({ partStore, active, onClick }: Props) => (
   <div styleName={`base ${active ? 'active' : ''}`} onClick={onClick}>
-    <div styleName="color" style={{ background: partStore.color }} />
+    <div styleName="color" style={{ borderTopColor: partStore.color }} />
     <canvas />
   </div>
 );

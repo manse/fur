@@ -13,31 +13,22 @@ type Props = {
 };
 
 function render(canvas: HTMLCanvasElement, { objectModelStore, partManagerStore }: Props) {
-  (canvas as any).onmousewheel = (e: MouseWheelEvent) => {
-    objectModelStore.setScale(objectModelStore.scale + e.wheelDelta * 0.1);
-  };
-  canvas.onmousedown = e => {
-    const start = {
-      x: e.clientX,
-      y: e.clientY
-    };
-    const initialCamera = {
-      x: objectModelStore.camera.x,
-      y: objectModelStore.camera.y
-    };
-    function mousemove(e: MouseEvent) {
-      objectModelStore.setCamera(
-        initialCamera.x - (e.clientY - start.y) * 0.01,
-        initialCamera.y + (e.clientX - start.x) * 0.01
-      );
-    }
-    function mouseup() {
-      window.removeEventListener('mousemove', mousemove as any);
-      window.removeEventListener('mouseup', mouseup);
-    }
-    window.addEventListener('mousemove', mousemove as any);
-    window.addEventListener('mouseup', mouseup);
-  };
+  (canvas as any).onmousewheel = (e: MouseWheelEvent) => objectModelStore.handleMousewheel(e.wheelDelta);
+  canvas.onmousedown = e =>
+    objectModelStore.handleMousedown({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
+  canvas.onmousemove = e =>
+    objectModelStore.handleMousemove({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
+  canvas.onmouseup = e =>
+    objectModelStore.handleMouseup({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
 
   const context = canvas.getContext('2d');
   context.save();
@@ -78,6 +69,10 @@ function render(canvas: HTMLCanvasElement, { objectModelStore, partManagerStore 
       context.stroke();
     });
   });
+
+  // optional rendering
+  objectModelStore.controller.render(context);
+
   context.restore();
 }
 

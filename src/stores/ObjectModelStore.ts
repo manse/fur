@@ -1,11 +1,21 @@
 import { observable } from 'mobx';
 import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
 import { Point2D } from '../utils/vo';
+import { DefaultController } from './controllers/DefaultController';
+import { FragmentController } from './controllers/FragmentController';
+import { IController } from './controllers/IController';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { VertexStore } from './VertexStore';
 
 export const M_PI_2 = Math.PI / 2;
+
+enum ControllerType {
+  default,
+  fragment,
+  edge,
+  multipleFragment
+}
 
 export class ObjectModelStore {
   @observable
@@ -21,6 +31,10 @@ export class ObjectModelStore {
   public scale = 100;
   @observable
   public key = 0;
+
+  public controller: IController = new DefaultController();
+
+  private dragging = false;
 
   public getFragmentAtPoint(p: Point2D) {
     const frags = this.fragmentStores.filter(f => f.testIntersection(p));
@@ -48,6 +62,65 @@ export class ObjectModelStore {
     if (this.scale < 1) this.scale = 1;
     this.updateProjection();
     this.invalidate();
+  }
+
+  public invalidate() {
+    this.key++;
+  }
+
+  public handleMousedown(point: Point2D) {
+    this.controller.start(point);
+    this.dragging = true;
+    this.invalidate();
+  }
+
+  public handleMousemove(point: Point2D) {
+    this.controller.update(point);
+    this.invalidate();
+  }
+
+  public handleMouseup(point: Point2D) {
+    this.controller.finish(point);
+    this.dragging = false;
+    this.invalidate();
+  }
+
+  public handleMousewheel(delta: number) {
+    this.controller.scroll(delta);
+    this.invalidate();
+  }
+
+  public handleKeyboard(e: KeyboardEvent) {
+    if (this.dragging) return;
+    const ctrl = e.metaKey || e.ctrlKey;
+    const alt = e.altKey;
+    if (ctrl && alt) {
+      this.setController(ControllerType.multipleFragment);
+    } else if (ctrl) {
+      this.setController(ControllerType.fragment);
+    } else if (alt) {
+      this.setController(ControllerType.edge);
+    } else {
+      this.setController(ControllerType.default);
+    }
+  }
+
+  public setController(type: ControllerType) {
+    switch (type) {
+      case ControllerType.default:
+        this.controller = new DefaultController();
+        break;
+      case ControllerType.fragment:
+        this.controller = new FragmentController();
+        break;
+      default:
+        return;
+    }
+    this.invalidate();
+  }
+
+  public resetController() {
+    this.setController(ControllerType.default);
   }
 
   public loadModelFromObjString(obj: string) {
@@ -83,10 +156,6 @@ export class ObjectModelStore {
     this.verticeStores = [...this.verticeStores, ...quadCenterVertices];
     this.updateProjection();
     this.invalidate();
-  }
-
-  public invalidate() {
-    this.key++;
   }
 
   private updateProjection() {
