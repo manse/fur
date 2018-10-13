@@ -10,31 +10,28 @@ type Props = {
   partManagerStore?: PartManagerStore;
 };
 
+type State = {
+  innerWidth: number;
+  innerHeight: number;
+};
+
 function handleEvent(canvas: HTMLCanvasElement, { modelStore }: Props) {
-  (canvas as any).onmousewheel = (e: MouseWheelEvent) => modelStore.controller.scroll(e.wheelDelta);
-  canvas.onmousedown = e => {
-    const controller = modelStore.controller;
-    controller.start({
+  (canvas as any).onmousewheel = (e: MouseWheelEvent) => modelStore.performScroll(e.wheelDelta);
+  canvas.onmousedown = e =>
+    modelStore.performStart({
       x: e.x - canvas.width / 2,
       y: e.y - canvas.height / 2
     });
-    const mousemove = (e: MouseEvent) => {
-      controller.update({
-        x: e.x - canvas.width / 2,
-        y: e.y - canvas.height / 2
-      });
-    };
-    const mouseup = (e: MouseEvent) => {
-      controller.finish({
-        x: e.x - canvas.width / 2,
-        y: e.y - canvas.height / 2
-      });
-      window.removeEventListener('mousemove', mousemove);
-      window.removeEventListener('mouseup', mouseup);
-    };
-    window.addEventListener('mousemove', mousemove);
-    window.addEventListener('mouseup', mouseup);
-  };
+  canvas.onmousemove = e =>
+    modelStore.performUpdate({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
+  canvas.onmouseup = e =>
+    modelStore.performFinish({
+      x: e.x - canvas.width / 2,
+      y: e.y - canvas.height / 2
+    });
 }
 
 function render(canvas: HTMLCanvasElement, { modelStore, partManagerStore }: Props) {
@@ -82,14 +79,19 @@ function render(canvas: HTMLCanvasElement, { modelStore, partManagerStore }: Pro
   });
 
   // optional rendering
-  modelStore.controller.render(context);
+  modelStore.performRender(context);
 
   context.restore();
 }
 
 @inject('modelStore', 'partManagerStore')
 @observer
-export class ModelRenderer extends Component<Props> {
+export class ModelRenderer extends Component<Props, State> {
+  public state = {
+    innerWidth,
+    innerHeight
+  };
+
   public componentDidMount() {
     window.addEventListener('resize', this.invalidate);
   }
@@ -99,13 +101,16 @@ export class ModelRenderer extends Component<Props> {
   }
 
   private invalidate = () => {
-    this.props.modelStore.invalidate();
+    this.setState({
+      innerWidth,
+      innerHeight
+    });
   };
 
   public render() {
     return (
       <canvas
-        key={this.props.modelStore.key}
+        key={this.props.modelStore.key + this.state.innerWidth + this.state.innerHeight}
         ref={canvas => {
           if (canvas) {
             render(canvas, this.props);

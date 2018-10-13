@@ -14,23 +14,23 @@ export const CheatSheet = inject('editorStore', 'modelStore')(
       <h1>fur</h1>
       {editorStore.editorTab === EditorTab.model ? (
         <div>
-          <dl styleName={modelStore.controller.type === ControllerType.default ? 'active' : ''}>
+          <dl styleName={modelStore.controllerType === ControllerType.default ? 'active' : ''}>
             <dt>Click</dt>
             <dd>Move camera</dd>
           </dl>
-          <dl styleName={modelStore.controller.type === ControllerType.fragment ? 'active' : ''}>
+          <dl styleName={modelStore.controllerType === ControllerType.fragment ? 'active' : ''}>
             <dt>Shift + Click</dt>
             <dd>Pick or unpick fragment</dd>
           </dl>
-          <dl styleName={modelStore.controller.type === ControllerType.multipleFragmentAdd ? 'active' : ''}>
+          <dl styleName={modelStore.controllerType === ControllerType.multipleFragmentAdd ? 'active' : ''}>
             <dt>Shift + A + Click</dt>
             <dd>Pick multiple fragment</dd>
           </dl>
-          <dl styleName={modelStore.controller.type === ControllerType.multipleFragmentRemove ? 'active' : ''}>
+          <dl styleName={modelStore.controllerType === ControllerType.multipleFragmentRemove ? 'active' : ''}>
             <dt>Shift + Z + Click</dt>
             <dd>Unpick multiple fragment</dd>
           </dl>
-          <dl styleName={modelStore.controller.type === ControllerType.edge ? 'active' : ''}>
+          <dl styleName={modelStore.controllerType === ControllerType.edge ? 'active' : ''}>
             <dt>Ctrl + Click</dt>
             <dd>Pick or unpick edge as darts</dd>
           </dl>

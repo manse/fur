@@ -10,10 +10,13 @@ type Stores = {
 
 export class FragmentController implements IController {
   private toRemove = false;
+  private dragging = false;
+  private lastPoint: Point2D;
 
   constructor(private stores: Stores) {}
 
   public start(point: Point2D) {
+    this.dragging = true;
     const fragment = this.stores.modelStore.getFragmentAtPoint(point);
     this.toRemove =
       this.stores.partManagerStore.activePartStore &&
@@ -22,14 +25,28 @@ export class FragmentController implements IController {
   }
 
   public update(point: Point2D) {
+    this.lastPoint = point;
+    if (!this.dragging) return;
     this.evaluate(point);
   }
 
-  public finish(_: Point2D) {}
+  public finish(_: Point2D) {
+    this.dragging = false;
+  }
 
   public scroll(_: number) {}
 
-  public render(_: CanvasRenderingContext2D) {}
+  public render(context: CanvasRenderingContext2D) {
+    if (!this.lastPoint) return;
+    const fragment = this.stores.modelStore.getFragmentAtPoint(this.lastPoint);
+    if (!fragment) return;
+    context.fillStyle = 'rgba(255,255,0,0.3)';
+    context.beginPath();
+    context.moveTo(fragment.v0.projection.x, fragment.v0.projection.y);
+    context.lineTo(fragment.v1.projection.x, fragment.v1.projection.y);
+    context.lineTo(fragment.v2.projection.x, fragment.v2.projection.y);
+    context.fill();
+  }
 
   public get type() {
     return ControllerType.fragment;
@@ -45,6 +62,5 @@ export class FragmentController implements IController {
     } else {
       partStore.addFragment(fragment);
     }
-    this.stores.modelStore.invalidate();
   }
 }

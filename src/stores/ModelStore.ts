@@ -14,18 +14,18 @@ import { VertexStore } from './VertexStore';
 export const M_PI_2 = Math.PI / 2;
 
 export enum ControllerType {
-  default,
-  fragment,
-  edge,
-  multipleFragmentAdd,
-  multipleFragmentRemove
+  default = 'default',
+  fragment = 'fragment',
+  edge = 'edge',
+  multipleFragmentAdd = 'multipleFragmentAdd',
+  multipleFragmentRemove = 'multipleFragmentRemove'
 }
 
 export class ModelStore {
   @observable
   public key = 0;
   @observable
-  public controller: IController;
+  public controllerType: ControllerType = ControllerType.default;
 
   public verticeStores: VertexStore[] = [];
   public fragmentStores: FragmentStore[] = [];
@@ -34,10 +34,28 @@ export class ModelStore {
     y: 0
   };
   public scale = 100;
-  private partManagerStore: PartManagerStore;
+  private defaultController: IController;
+  private fragmentController: IController;
+  private edgeController: IController;
+  private multipleFragmentAddController: IController;
+  private multipleFragmentRemoveController: IController;
+
+  private pendingControllerType: ControllerType;
+  private hasStarted = false;
 
   constructor({ partManagerStore }: { partManagerStore: PartManagerStore }) {
-    this.partManagerStore = partManagerStore;
+    const stores = {
+      modelStore: this,
+      partManagerStore
+    };
+    this.defaultController = new DefaultController(stores);
+    this.fragmentController = new FragmentController(stores);
+    this.edgeController = new EdgeController(stores);
+    this.multipleFragmentAddController = new MultipleFragmentController(stores, MultipleFragmentControllerMode.add);
+    this.multipleFragmentRemoveController = new MultipleFragmentController(
+      stores,
+      MultipleFragmentControllerMode.remove
+    );
     this.resetController();
   }
 
@@ -69,56 +87,61 @@ export class ModelStore {
     this.invalidate();
   }
 
-  public invalidate() {
-    this.key++;
-  }
-
   public handleKeyboard(e: KeyboardEvent) {
     const shift = e.shiftKey;
     const ctrl = e.metaKey || e.ctrlKey;
     const key = e.type === 'keyup' ? '' : String.fromCharCode(e.which);
+    let nextControllerType: ControllerType;
     if (key === 'A') {
-      this.setController(ControllerType.multipleFragmentAdd);
+      nextControllerType = ControllerType.multipleFragmentAdd;
     } else if (key === 'Z') {
-      this.setController(ControllerType.multipleFragmentRemove);
+      nextControllerType = ControllerType.multipleFragmentRemove;
     } else if (shift) {
-      this.setController(ControllerType.fragment);
+      nextControllerType = ControllerType.fragment;
     } else if (ctrl) {
-      this.setController(ControllerType.edge);
+      nextControllerType = ControllerType.edge;
     } else {
-      this.setController(ControllerType.default);
+      nextControllerType = ControllerType.default;
+    }
+    if (this.hasStarted) {
+      this.pendingControllerType = nextControllerType;
+    } else {
+      this.controllerType = nextControllerType;
     }
   }
 
-  public setController(type: ControllerType) {
-    const stores = {
-      modelStore: this,
-      partManagerStore: this.partManagerStore
-    };
-    switch (type) {
-      case ControllerType.default:
-        this.controller = new DefaultController(stores);
-        break;
-      case ControllerType.fragment:
-        this.controller = new FragmentController(stores);
-        break;
-      case ControllerType.edge:
-        this.controller = new EdgeController(stores);
-        break;
-      case ControllerType.multipleFragmentAdd:
-        this.controller = new MultipleFragmentController(stores, MultipleFragmentControllerMode.add);
-        break;
-      case ControllerType.multipleFragmentRemove:
-        this.controller = new MultipleFragmentController(stores, MultipleFragmentControllerMode.remove);
-        break;
-      default:
-        return;
+  public resetController() {
+    this.controllerType = ControllerType.default;
+  }
+
+  public performStart(point: Point2D) {
+    this.hasStarted = true;
+    this.getController().start(point);
+    this.invalidate();
+  }
+
+  public performUpdate(point: Point2D) {
+    this.getController().update(point);
+    this.invalidate();
+  }
+
+  public performFinish(point: Point2D) {
+    this.hasStarted = false;
+    this.getController().finish(point);
+    if (this.pendingControllerType) {
+      this.controllerType = this.pendingControllerType;
+      this.pendingControllerType = null;
     }
     this.invalidate();
   }
 
-  public resetController() {
-    this.setController(ControllerType.default);
+  public performScroll(delta: number) {
+    this.getController().scroll(delta);
+    this.invalidate();
+  }
+
+  public performRender(context: CanvasRenderingContext2D) {
+    this.getController().render(context);
   }
 
   public loadModelFromObjString(obj: string) {
@@ -162,5 +185,24 @@ export class ModelStore {
     multiply(rotationX(this.camera.x), camera, camera);
     multiply(scaling([this.scale, this.scale, this.scale]), camera, camera);
     this.verticeStores.forEach(v => v.project(camera));
+  }
+
+  private getController(): IController {
+    switch (this.controllerType) {
+      case ControllerType.default:
+        return this.defaultController;
+      case ControllerType.fragment:
+        return this.fragmentController;
+      case ControllerType.edge:
+        return this.edgeController;
+      case ControllerType.multipleFragmentAdd:
+        return this.multipleFragmentAddController;
+      case ControllerType.multipleFragmentRemove:
+        return this.multipleFragmentRemoveController;
+    }
+  }
+
+  private invalidate() {
+    this.key++;
   }
 }

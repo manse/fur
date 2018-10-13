@@ -25,7 +25,6 @@ export class MultipleFragmentController implements IController {
 
   public update(point: Point2D) {
     this.endPoint = point;
-    this.stores.modelStore.invalidate();
   }
 
   public finish(_: Point2D) {
@@ -41,6 +40,7 @@ export class MultipleFragmentController implements IController {
           break;
       }
     });
+    this.startPoint = this.endPoint = null;
   }
 
   public scroll(_: number) {}
@@ -83,7 +83,6 @@ export class MultipleFragmentController implements IController {
   }
 
   public render(context: CanvasRenderingContext2D) {
-    console.log(this.startPoint, this.endPoint);
     if (!this.startPoint || !this.endPoint) return;
     const { left, top, width, height } = this.getBounds();
     context.lineWidth = 0.5;
@@ -92,10 +91,10 @@ export class MultipleFragmentController implements IController {
 
     switch (this.mode) {
       case MultipleFragmentControllerMode.add:
-        context.fillStyle = 'rgba(255,255,0,0.5)';
+        context.fillStyle = 'rgba(255,255,0,0.3)';
         break;
       case MultipleFragmentControllerMode.remove:
-        context.fillStyle = 'rgba(255,0,255,0.5)';
+        context.fillStyle = 'rgba(255,0,255,0.3)';
         break;
     }
     context.beginPath();

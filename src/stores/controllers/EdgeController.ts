@@ -39,6 +39,5 @@ export class EdgeController implements IController {
     } else {
       partStore.addEdge(edge);
     }
-    this.stores.modelStore.invalidate();
   }
 }
