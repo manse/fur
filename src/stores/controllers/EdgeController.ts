@@ -9,17 +9,29 @@ type Stores = {
 };
 
 export class EdgeController implements IController {
+  private toRemove = false;
+  private dragging = false;
+
   constructor(private stores: Stores) {}
 
   public start(point: Point2D) {
+    this.dragging = true;
+    const edge = this.stores.modelStore.getNearestEdgeAtPoint(point);
+    this.toRemove =
+      !!edge &&
+      this.stores.partManagerStore.activePartStore &&
+      this.stores.partManagerStore.activePartStore.includesEdge(edge);
     this.evaluate(point);
   }
 
   public update(point: Point2D) {
+    if (!this.dragging) return;
     this.evaluate(point);
   }
 
-  public finish(_: Point2D) {}
+  public finish(_: Point2D) {
+    this.dragging = false;
+  }
 
   public scroll(_: number) {}
 
@@ -34,7 +46,7 @@ export class EdgeController implements IController {
     if (!edge) return;
     const partStore = this.stores.partManagerStore.activePartStore;
     if (!partStore) return;
-    if (partStore.includesEdge(edge)) {
+    if (this.toRemove) {
       partStore.removeEdge(edge);
     } else {
       partStore.addEdge(edge);
