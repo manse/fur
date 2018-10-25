@@ -1,4 +1,5 @@
 import { observer, Provider } from 'mobx-react';
+import { Fragment } from 'react';
 import { render } from 'react-dom';
 import { Button } from './components/Button';
 import { CheatSheet } from './components/CheatSheet';
@@ -33,30 +34,31 @@ const App = observer(() => (
       <Pane position="sidebar">
         <PartList />
         <Toolbar
-          leftItems={[
-            <Button key={1} icon="folder" onClick={() => {}} />,
-            <Button key={2} icon="plus" onClick={() => stores.partManagerStore.addPartStore()} />,
-            <Button
-              key={3}
-              icon="trash"
-              disabled={!stores.partManagerStore.activePartStore}
-              onClick={() => stores.partManagerStore.removeActivePartStore()}
-            />
-          ]}
-          rightItems={[
-            <Button
-              key={1}
-              icon="refresh"
-              disabled={!stores.partManagerStore.activePartStore}
-              onClick={() => stores.partManagerStore.refreshActivePartStore()}
-            />,
-            <Button
-              key={2}
-              icon="download"
-              disabled={!stores.partManagerStore.activePartStore}
-              onClick={() => stores.partManagerStore.saveActivePartStoreAsImage()}
-            />
-          ]}
+          leftItems={
+            <Fragment>
+              <Button icon="folder" onClick={() => {}} />
+              <Button icon="plus" onClick={() => stores.partManagerStore.addPartStore()} />
+              <Button
+                icon="trash"
+                disabled={!stores.partManagerStore.activePartStore}
+                onClick={() => stores.partManagerStore.removeActivePartStore()}
+              />
+            </Fragment>
+          }
+          rightItems={
+            <Fragment>
+              <Button
+                icon="refresh"
+                disabled={!stores.partManagerStore.activePartStore}
+                onClick={() => stores.partManagerStore.refreshActivePartStore()}
+              />
+              <Button
+                icon="download"
+                disabled={!stores.partManagerStore.activePartStore}
+                onClick={() => stores.partManagerStore.saveActivePartStoreAsImage()}
+              />
+            </Fragment>
+          }
         />
       </Pane>
     </Layout>
