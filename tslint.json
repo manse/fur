@@ -1,23 +1,22 @@
 {
-  "defaultSeverity": "error",
-  "extends": ["tslint:recommended", "tslint-config-prettier"],
-  "jsRules": {},
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "extends": ["tslint-react", "tslint-config-airbnb", "tslint-config-prettier"],
   "rules": {
-    "array-type": false,
-    "ban-types": false,
-    "curly": false,
-    "member-ordering": false,
-    "no-console": false,
-    "no-empty": false,
-    "no-shadowed-variable": false,
-    "no-unused-expression": false,
-    "no-var-requires": false,
-    "object-literal-sort-keys": false,
-    "ordered-imports": false,
-    "variable-name": false,
-    "interface-over-type-literal": false,
-    "max-classes-per-file": false,
-    "no-conditional-assignment": false
-  },
-  "rulesDirectory": []
+    "prettier": [
+      true,
+      {
+        "printWidth": 120,
+        "tabWidth": 2,
+        "useTabs": false,
+        "semi": true,
+        "singleQuote": true,
+        "trailingComma": "all",
+        "bracketSpacing": true,
+        "arrowParens": "avoid",
+        "requirePragma": false
+      }
+    ],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case", "allow-leading-underscore"],
+    "import-name": false
+  }
 }

@@ -1,68 +1,18 @@
-import { observer, Provider } from 'mobx-react';
-import { Fragment } from 'react';
+import { Provider } from 'mobx-react';
 import { render } from 'react-dom';
-import { Button } from './components/Button';
-import { CheatSheet } from './components/CheatSheet';
-import { Layout } from './components/Layout';
-import { ModelRenderer } from './components/ModelRenderer';
-import { Pane } from './components/Pane';
-import { PartList } from './components/PartList';
-import { PatternRenderer } from './components/PatternRenderer';
-import { SegmentedControl } from './components/SegmentedControl';
-import { Toolbar } from './components/Toolbar';
+import { Layout } from './components/global/Layout';
+import { LayoutEditor } from './components/global/LayoutEditor';
+import { LayoutSidebar } from './components/global/LayoutSidebar';
 import stores from './stores';
-import { EditorTab, EditorTabList } from './stores/EditorStore';
 import './styles/app.pcss';
 
-const App = observer(() => (
+const App = () => (
   <Provider {...stores}>
     <Layout>
-      <Pane position="body">
-        {stores.editorStore.editorTab === EditorTab.model ? <ModelRenderer /> : null}
-        {stores.editorStore.editorTab === EditorTab.pattern ? <PatternRenderer /> : null}
-        <CheatSheet />
-        <div styleName="display-switch">
-          <SegmentedControl
-            items={['Model', 'Pattern']}
-            selectedIndex={EditorTabList.indexOf(stores.editorStore.editorTab)}
-            onClickItem={i => {
-              stores.editorStore.setEditorTab(EditorTabList[i]);
-            }}
-          />
-        </div>
-      </Pane>
-      <Pane position="sidebar">
-        <PartList />
-        <Toolbar
-          leftItems={
-            <Fragment>
-              <Button icon="folder" onClick={() => {}} />
-              <Button icon="plus" onClick={() => stores.partManagerStore.addPartStore()} />
-              <Button
-                icon="trash"
-                disabled={!stores.partManagerStore.activePartStore}
-                onClick={() => stores.partManagerStore.removeActivePartStore()}
-              />
-            </Fragment>
-          }
-          rightItems={
-            <Fragment>
-              <Button
-                icon="refresh"
-                disabled={!stores.partManagerStore.activePartStore}
-                onClick={() => stores.partManagerStore.refreshActivePartStore()}
-              />
-              <Button
-                icon="download"
-                disabled={!stores.partManagerStore.activePartStore}
-                onClick={() => stores.partManagerStore.saveActivePartStoreAsImage()}
-              />
-            </Fragment>
-          }
-        />
-      </Pane>
+      <LayoutEditor />
+      <LayoutSidebar />
     </Layout>
   </Provider>
-));
+);
 
 render(<App />, document.querySelector('#app'));

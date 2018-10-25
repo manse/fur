@@ -1,5 +1,5 @@
 import { Point2D } from '../../utils/vo';
-import { ControllerType } from '../ModelStore';
+import { ControllerType } from '../EditorStore';
 
 export interface IController {
   start(p: Point2D): void;

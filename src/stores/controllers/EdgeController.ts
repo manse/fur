@@ -1,5 +1,6 @@
 import { Point2D } from '../../utils/vo';
-import { ControllerType, ModelStore } from '../ModelStore';
+import { ControllerType } from '../EditorStore';
+import { ModelStore } from '../ModelStore';
 import { PartManagerStore } from '../PartManagerStore';
 import { IController } from './IController';
 

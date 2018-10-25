@@ -1,4 +1,4 @@
-import { PartStore } from '../stores/PartStore';
+import { PartStore } from '../../stores/PartStore';
 import './styles/PartListItem.pcss';
 
 type Props = {

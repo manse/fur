@@ -4,11 +4,10 @@ import { ModelStore } from './ModelStore';
 import { PartManagerStore } from './PartManagerStore';
 
 const partManagerStore = new PartManagerStore();
-const modelStore = new ModelStore({
-  partManagerStore
-});
+const modelStore = new ModelStore();
 const editorStore = new EditorStore({
-  modelStore
+  partManagerStore,
+  modelStore,
 });
 modelStore.loadModelFromObjString(sampleObj);
 partManagerStore.addPartStore();
@@ -16,5 +15,5 @@ partManagerStore.addPartStore();
 export default {
   partManagerStore,
   modelStore,
-  editorStore
+  editorStore,
 };
