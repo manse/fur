@@ -33,7 +33,7 @@ export const CheatSheet = compose<Props, Props>(
         </dl>
         <dl styleName={editorStore.controllerType === ControllerType.edge ? 'active' : ''}>
           <dt>Command + Click</dt>
-          <dd>Pick or unpick edge as darts</dd>
+          <dd>Pick or unpick darts</dd>
         </dl>
       </div>
     ) : null}
