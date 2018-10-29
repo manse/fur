@@ -1,8 +1,10 @@
+import { observable } from 'mobx';
 import { FragmentStore } from '../../../stores/FragmentStore';
 import { Point2D } from '../../../utils/vo';
 import { BaseController } from './BaseController';
 
 export class FragmentController extends BaseController {
+  @observable
   public hoveredFragment: FragmentStore;
 
   public drag(point: Point2D) {

@@ -11,7 +11,14 @@ import { BaseController } from './controllers/BaseController';
 import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import { AddMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
+import {
+  AddMultiFragmentController,
+  BaseMultiFragmentController,
+  RemoveMultiFragmentController,
+} from './controllers/MultiFragmentController';
+import { EdgeHelper } from './helpers/EdgeHelper';
+import { FragmentHelper } from './helpers/FragmentHelper';
+import { MultiFragmentHelper } from './helpers/MultiFragmentController';
 
 type Props = {
   modelStore?: ModelStore;
@@ -139,7 +146,6 @@ export class ModelRenderer extends React.Component<Props, State> {
   };
 
   private handleMousemove = (e: MouseEvent) => {
-    if (this.dragging) return;
     this.controller.hover(this.transformPointToProjection(e));
   };
 
@@ -201,6 +207,14 @@ export class ModelRenderer extends React.Component<Props, State> {
       ],
       [],
     );
+    let helper: React.ReactNode;
+    if (this.controller instanceof FragmentController) {
+      helper = <FragmentHelper fragmentController={this.controller} />;
+    } else if (this.controller instanceof EdgeController) {
+      helper = <EdgeHelper edgeController={this.controller} />;
+    } else if (this.controller instanceof BaseMultiFragmentController) {
+      helper = <MultiFragmentHelper multiFragmentController={this.controller} />;
+    }
 
     return (
       <div ref={this.handleRef}>
@@ -209,6 +223,7 @@ export class ModelRenderer extends React.Component<Props, State> {
           <Layer x={this.state.width / 2} y={this.state.height / 2}>
             {fragments}
             {edges}
+            {helper}
           </Layer>
         </Stage>
       </div>

@@ -1,7 +1,12 @@
+import { observable } from 'mobx';
+import { EdgeStore } from '../../../stores/EdgeStore';
 import { Point2D } from '../../../utils/vo';
 import { BaseController } from './BaseController';
 
 export class EdgeController extends BaseController {
+  @observable
+  public hoveredEdge: EdgeStore | void;
+
   public drag(point: Point2D) {
     const edge = this.modelStore.getNearestEdgeAtPoint(point);
     const toRemove =
@@ -27,5 +32,7 @@ export class EdgeController extends BaseController {
 
   public scroll(_: number) {}
 
-  public hover() {}
+  public hover(point: Point2D) {
+    this.hoveredEdge = this.modelStore.getNearestEdgeAtPoint(point);
+  }
 }
