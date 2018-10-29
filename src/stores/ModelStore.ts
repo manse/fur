@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action } from 'mobx';
 import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
 import { Point2D } from '../utils/vo';
 import { EdgeStore } from './EdgeStore';
@@ -8,11 +8,31 @@ import { VertexStore } from './VertexStore';
 export const M_PI_2 = Math.PI / 2;
 
 export class ModelStore {
-  @observable
-  public invalidateKey = 0;
-
   public verticeStores: VertexStore[] = [];
   public fragmentStores: FragmentStore[] = [];
+  public viewport = {
+    camera: {
+      x: 0,
+      y: 0,
+    },
+    scale: 100,
+  };
+
+  @action
+  public setCamera(x: number, y: number) {
+    this.viewport.camera.x = x;
+    this.viewport.camera.y = y;
+    if (this.viewport.camera.x < -M_PI_2) this.viewport.camera.x = -M_PI_2;
+    else if (this.viewport.camera.x > M_PI_2) this.viewport.camera.x = M_PI_2;
+    this.updateProjection();
+  }
+
+  @action
+  public setScale(scale: number) {
+    this.viewport.scale = scale;
+    if (this.viewport.scale < 1) this.viewport.scale = 1;
+    this.updateProjection();
+  }
 
   public getFragmentAtPoint(p: Point2D) {
     const frags = this.fragmentStores.filter(f => f.testIntersection(p));
@@ -26,6 +46,7 @@ export class ModelStore {
     return fragment.getNearestEdge(p);
   }
 
+  @action
   public loadModelFromObjString(obj: string) {
     this.verticeStores = [];
     this.fragmentStores = [];
@@ -57,18 +78,14 @@ export class ModelStore {
       }
     });
     this.verticeStores = [...this.verticeStores, ...quadCenterVertices];
-    this.invalidate();
+    this.updateProjection();
   }
 
-  public updateProjection(viewport: { camera: Point2D; scale: number }) {
+  public updateProjection() {
     const camera = identity();
-    multiply(rotationY(viewport.camera.y), camera, camera);
-    multiply(rotationX(viewport.camera.x), camera, camera);
-    multiply(scaling([viewport.scale, viewport.scale, viewport.scale]), camera, camera);
+    multiply(rotationY(this.viewport.camera.y), camera, camera);
+    multiply(rotationX(this.viewport.camera.x), camera, camera);
+    multiply(scaling([this.viewport.scale, this.viewport.scale, this.viewport.scale]), camera, camera);
     this.verticeStores.forEach(v => v.project(camera));
-  }
-
-  public invalidate() {
-    this.invalidateKey += 1;
   }
 }

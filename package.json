@@ -10,11 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "color-convert": "^1.9.3",
+    "konva": "^2.5.0",
     "mobx": "4",
     "mobx-react": "^5.2.3",
     "ramda": "^0.25.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-konva": "^16.6.0",
     "recompose": "^0.28.2"
   },
   "devDependencies": {

@@ -49,6 +49,12 @@ const dependencies = [
     to: `${md5('ramda' + now)}.js`,
     module: 'ramda',
     global: 'R'
+  },
+  {
+    from: 'node_modules/konva/konva.min.js',
+    to: `${md5('konva' + now)}.js`,
+    module: 'konva',
+    global: 'Konva'
   }
 ];
 const rules = [

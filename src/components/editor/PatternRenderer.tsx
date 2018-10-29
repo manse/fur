@@ -11,4 +11,4 @@ type Props = {
 export const PatternRenderer = compose<Props, Props>(
   inject('modelStore', 'partManagerStore'),
   observer,
-)(props => <canvas key={props.modelStore.invalidateKey} ref={canvas => canvas} />);
+)(_ => <canvas ref={canvas => canvas} />);

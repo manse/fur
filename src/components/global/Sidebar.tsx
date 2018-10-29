@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { PartList } from '../sidebar/PartList';
 import { Toolbar } from '../sidebar/Toolbar';
-import './styles/LayoutSidebar.pcss';
+import './styles/Sidebar.pcss';
 
-export const LayoutSidebar = () => (
+export const Sidebar = () => (
   <div styleName="base">
     <PartList />
     <Toolbar />
