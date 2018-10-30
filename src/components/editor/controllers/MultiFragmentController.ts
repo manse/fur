@@ -81,6 +81,6 @@ export class AddMultiFragmentController extends BaseMultiFragmentController {
 
 export class RemoveMultiFragmentController extends BaseMultiFragmentController {
   public controlFragment(partStore: PartStore, target: FragmentStore) {
-    partStore.addFragment(target);
+    partStore.removeFragment(target);
   }
 }
