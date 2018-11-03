@@ -2,6 +2,7 @@ import { hsv } from 'color-convert';
 import { observable } from 'mobx';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
+import { MeshStore } from './MeshStore';
 
 const hues = [
   ...Array.from({ length: 30 }).map((_, n) => n),
@@ -16,6 +17,8 @@ export class PartStore {
   public fragmentStores: FragmentStore[] = [];
   @observable
   public edgeStores: EdgeStore[] = [];
+
+  public meshStore = new MeshStore(this.fragmentStores, this.edgeStores);
 
   public includesFragmentStore(fragment: FragmentStore) {
     return this.fragmentStores.indexOf(fragment) !== -1;
@@ -32,20 +35,27 @@ export class PartStore {
   public addFragment(fragment: FragmentStore) {
     if (this.includesFragmentStore(fragment)) return;
     this.fragmentStores.push(fragment);
+    this.meshStore.simulate();
   }
 
   public removeFragment(fragment: FragmentStore) {
-    this.fragmentStores = this.fragmentStores.filter(f => fragment !== f);
+    const index = this.fragmentStores.indexOf(fragment);
+    if (index >= 0) {
+      this.fragmentStores.splice(index, 1);
+    }
+    this.meshStore.simulate();
   }
 
   public addEdge(edge: EdgeStore) {
     if (this.includesEdge(edge)) return;
     this.edgeStores.push(edge);
+    this.meshStore.simulate();
   }
 
   public removeEdge(edge: EdgeStore) {
     const index = this.indexOfEdgeStore(edge);
     if (index === -1) return;
     this.edgeStores.splice(index, 1);
+    this.meshStore.simulate();
   }
 }
