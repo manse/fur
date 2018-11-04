@@ -7,12 +7,17 @@ function sign(p1: Point2D, p2: Point2D, p3: Point2D) {
 }
 
 export class FragmentStore {
+  public id = Math.floor(Math.random() * 1e8).toString(36);
   public edgeStores: EdgeStore[] = [];
   public vertexStores: VertexStore[] = [];
 
   constructor(public v0: VertexStore, public v1: VertexStore, public v2: VertexStore) {
     this.edgeStores = [new EdgeStore(v0, v1), new EdgeStore(v1, v2), new EdgeStore(v2, v0)];
     this.vertexStores = [v0, v1, v2];
+  }
+
+  public containsEdge(edgeStore: EdgeStore) {
+    return this.edgeStores.some(e => e.equals(edgeStore));
   }
 
   public testIntersection(point: Point2D) {
