@@ -8,7 +8,13 @@ enum Phase {
   wire,
 }
 
+const M_PI2 = Math.PI * 2;
+
 function noop() {}
+
+function rad2deg(rad: number) {
+  return Math.floor((rad * 180) / Math.PI);
+}
 
 function pow2(n: number) {
   return n * n;
@@ -40,24 +46,20 @@ class VectorStore {
   @observable
   public offsetY: number = 0;
 
-  public relations: VectorStore[] = [];
-
   private constructor(public vertexStore: VertexStore, radius: number, angle: number) {
     this.radius = radius;
     this.angle = angle;
   }
 
+  @action
   public translate(dx: number, dy: number) {
-    this.offsetX = dx;
-    this.offsetY = dy;
+    this.offsetX += dx;
+    this.offsetY += dy;
   }
 
+  @action
   public rotate(delta: number) {
     this.angle += delta;
-  }
-
-  public addRelation(relation: VectorStore) {
-    this.relations.push(relation);
   }
 
   @computed
@@ -78,21 +80,79 @@ class VectorStore {
   }
 
   public static fromPoints(vertexStore: VertexStore, fromX: number, fromY: number, toX: number, toY: number) {
-    return new VectorStore(vertexStore, Math.atan2(toY - fromY, toX - fromX), length(fromX, fromY, toX, toY));
+    return new VectorStore(vertexStore, length(fromX, fromY, toX, toY), Math.atan2(toY - fromY, toX - fromX));
+  }
+}
+
+class WireStore {
+  constructor(public plateStore: PlateStore, public v0: VectorStore, public v1: VectorStore) {}
+
+  private zipPairWire(wire: WireStore) {
+    const a = this.v0;
+    const b = this.v1;
+    const c = wire.v0;
+    const d = wire.v1;
+    if (a.vertexStore === c.vertexStore && b.vertexStore === d.vertexStore) {
+      return [[a, b], [c, d]];
+    }
+    if (a.vertexStore === d.vertexStore && b.vertexStore === c.vertexStore) {
+      return [[a, b], [d, c]];
+    }
+    throw new Error('Invalid pair vectors');
+  }
+
+  public calcRotationDelta(wire: WireStore) {
+    const [[start0, end0], [start1, end1]] = this.zipPairWire(wire);
+    const startCoord0 = start0.globalCoordinate;
+    const endCoord0 = end0.globalCoordinate;
+    const startCoord1 = start1.globalCoordinate;
+    const endCoord1 = end1.globalCoordinate;
+    const selfAngle = Math.atan2(endCoord0.y - startCoord0.y, endCoord0.x - startCoord0.x) + Math.random() * 0.1;
+    const targetAngle = Math.atan2(endCoord1.y - startCoord1.y, endCoord1.x - startCoord1.x) + Math.random() * 0.1;
+    let rotation = (targetAngle - selfAngle + M_PI2) % M_PI2;
+    if (rotation > Math.PI) rotation -= M_PI2;
+    // console.log(rad2deg(selfAngle - targetAngle), rad2deg(rotation), rad2deg(selfAngle), rad2deg(targetAngle));
+    return rotation * 0.3 * Math.random();
+  }
+
+  public calcTranslationDelta(wire: WireStore): [number, number] {
+    const [[start0, end0], [start1, end1]] = this.zipPairWire(wire);
+    const startCoord0 = start0.globalCoordinate;
+    const endCoord0 = end0.globalCoordinate;
+    const startCoord1 = start1.globalCoordinate;
+    const endCoord1 = end1.globalCoordinate;
+    const selfX = (startCoord0.x + endCoord0.x) / 2;
+    const selfY = (startCoord0.y + endCoord0.y) / 2;
+    const targetX = (startCoord1.x + endCoord1.x) / 2;
+    const targetY = (startCoord1.y + endCoord1.y) / 2;
+    return [(targetX - selfX) * 0.3, (targetY - selfY) * 0.3];
+  }
+
+  public equals(wire: WireStore) {
+    const a = wire.v0.vertexStore;
+    const b = wire.v1.vertexStore;
+    const x = this.v0.vertexStore;
+    const y = this.v1.vertexStore;
+    return (a === x && b === y) || (a === y && b === x);
+  }
+
+  public equalsToEdge(edge: EdgeStore) {
+    const a = edge.v0;
+    const b = edge.v1;
+    const x = this.v0.vertexStore;
+    const y = this.v1.vertexStore;
+    return (a === x && b === y) || (a === y && b === x);
   }
 }
 
 class PlateStore {
+  public id = Math.floor(Math.random() * 1e8).toString(36);
   public vectorStores: VectorStore[];
-  public edgeStores: EdgeStore[];
+  public wireStores: WireStore[];
 
   private constructor(public v0: VectorStore, public v1: VectorStore, public v2: VectorStore) {
     this.vectorStores = [v0, v1, v2];
-    this.edgeStores = [
-      new EdgeStore(v0.vertexStore, v1.vertexStore),
-      new EdgeStore(v1.vertexStore, v2.vertexStore),
-      new EdgeStore(v2.vertexStore, v0.vertexStore),
-    ];
+    this.wireStores = [new WireStore(this, v0, v1), new WireStore(this, v1, v2), new WireStore(this, v2, v0)];
   }
 
   @action
@@ -105,15 +165,13 @@ class PlateStore {
     this.vectorStores.forEach(vector => vector.rotate(delta));
   }
 
-  public findVectors(edgeStore: EdgeStore) {
-    const found = this.edgeStores.find(edge => edge.equals(edgeStore));
-    if (!found) return null;
-    const relation: [VectorStore, VectorStore] = [
-      this.vectorStores.find(v => v.vertexStore === found.v0),
-      this.vectorStores.find(v => v.vertexStore === found.v1),
-    ];
-    if (!relation[0] || !relation[1]) throw new Error('Not matched');
-    return relation;
+  @computed
+  public get globalCoordinates() {
+    return this.vectorStores.map(vector => vector.globalCoordinate);
+  }
+
+  public findWireByEdge(edgeStore: EdgeStore) {
+    return this.wireStores.find(wire => wire.equalsToEdge(edgeStore));
   }
 
   public static fromFragmentStore({ v0, v1, v2 }: FragmentStore) {
@@ -140,34 +198,31 @@ export class SimulationStore {
   @observable
   public phase = Phase.plate;
 
+  private relations: [WireStore, WireStore][] = [];
+
   constructor(private fragmentStores: FragmentStore[], private edgeStores: EdgeStore[]) {}
 
   @action
   public reset() {
+    console.log('reset');
     const connectedEdgeStores = this.collectConnectedEdgeStores();
     this.plateStores = this.fragmentStores
       .filter(fragment => connectedEdgeStores.some(relation => fragment.containsEdge(relation)))
       .map(fragment => PlateStore.fromFragmentStore(fragment));
+    this.plateStores.forEach(plate => {
+      plate.rotate(Math.random() * M_PI2);
+      plate.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
+    });
+    this.relations = [];
     connectedEdgeStores.forEach(edgeStore => {
-      const relations = this.plateStores.map(plate => plate.findVectors(edgeStore)).filter(id => !!id);
+      const relations = this.plateStores.map(plate => plate.findWireByEdge(edgeStore)).filter(id => !!id);
       if (!relations.length) return;
       if (relations.length !== 2) throw new Error('Invalid form of fragments');
-      const [[a, b], [c, d]] = relations;
-      let x: VectorStore;
-      let y: VectorStore;
-      let z: VectorStore;
-      let w: VectorStore;
-      if (a.vertexStore === c.vertexStore && b.vertexStore === d.vertexStore) {
-        [x, y, z, w] = [a, c, b, d];
-      } else if (a.vertexStore === d.vertexStore && b.vertexStore === c.vertexStore) {
-        [x, y, z, w] = [a, d, b, c];
-      } else {
-        throw new Error('Pairs not matched');
+      const [a, b] = relations;
+      if (this.relations.some(([x, y]) => (x.equals(a) && y.equals(b)) || (x.equals(b) && y.equals(a)))) {
+        return undefined;
       }
-      x.addRelation(y);
-      y.addRelation(x);
-      z.addRelation(w);
-      w.addRelation(z);
+      this.relations.push([a, b]);
     });
     this.phase = Phase.plate;
   }
@@ -184,25 +239,19 @@ export class SimulationStore {
     }
   }
 
-  private iteratePlate(factor = 1) {
-    // translate
-    this.plateStores
-      .map(plate => {
-        let dx = 0;
-        let dy = 0;
-        let count = 0;
-        plate.vectorStores.forEach(vector => {
-          const vectorCoord = vector.globalCoordinate;
-          vector.relations.forEach(relation => {
-            const relationCoord = relation.globalCoordinate;
-            dx += relationCoord.x - vectorCoord.x;
-            dy += relationCoord.y - vectorCoord.y;
-            count += 1;
-          });
-        });
-        return count ? () => plate.translate((dx / count) * factor, (dy / count) * factor) : noop;
-      })
-      .forEach(fn => fn());
+  private iteratePlate() {
+    this.relations.map(relation => {
+      const translation0 = relation[0].calcTranslationDelta(relation[1]);
+      const translation1 = relation[1].calcTranslationDelta(relation[0]);
+      relation[0].plateStore.translate(...translation0);
+      relation[1].plateStore.translate(...translation1);
+    });
+    this.relations.map(relation => {
+      const rotation0 = relation[0].calcRotationDelta(relation[1]);
+      const rotation1 = relation[1].calcRotationDelta(relation[0]);
+      relation[0].plateStore.rotate(rotation0);
+      relation[1].plateStore.rotate(rotation1);
+    });
   }
 
   private iterateWire() {}
@@ -213,15 +262,18 @@ export class SimulationStore {
 
     const relations: EdgeStore[] = [];
     const walk = (fragmentStore: FragmentStore) => {
-      fragmentStore.edgeStores.filter(edge => !this.edgeStores.some(e => e.equals(edge))).forEach(edge => {
-        this.fragmentStores
-          .filter(fragment => fragment.containsEdge(edge) && fragment !== fragmentStore)
-          .forEach(fragment => {
-            if (relations.some(relation => relation.equals(edge))) return;
-            relations.push(edge);
-            walk(fragment);
-          });
-      });
+      fragmentStore.edgeStores
+        // ignore darts
+        .filter(edge => !this.edgeStores.some(e => e.equals(edge)))
+        .forEach(edge => {
+          this.fragmentStores
+            .filter(fragment => fragment.containsEdge(edge) && fragment !== fragmentStore)
+            .forEach(fragment => {
+              if (relations.some(relation => relation.equals(edge))) return;
+              relations.push(edge);
+              walk(fragment);
+            });
+        });
     };
     walk(startFragment);
     return relations;
