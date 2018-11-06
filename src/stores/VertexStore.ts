@@ -3,7 +3,7 @@ import { project } from '../utils/m4';
 import { Point3D } from '../utils/vo';
 
 export class VertexStore {
-  public id = Math.floor(Math.random() * 1e8).toString(36);
+  public id = Math.floor(Math.random() * 1e12).toString(36);
   @observable
   public projection: Point3D = { x: 0, y: 0, z: 0 };
 

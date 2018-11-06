@@ -13,13 +13,14 @@ export const PatternGroup = compose<Props, Props>(
 )(
   ({ partManagerStore: { activePartStore } }) =>
     activePartStore ? (
-      <Group>
-        {activePartStore.simulationStore.plateStores.map((plate, i) => {
+      <Group scale={{ x: 100, y: 100 }}>
+        {activePartStore.simulationStore.springStores.map(spring => {
           return (
             <Line
-              key={Math.random()}
-              points={plate.globalCoordinates.reduce((acc, { x, y }) => [...acc, x * 60, y * 60], [])}
+              key={spring.id}
+              points={[spring.a0.x, spring.a0.y, spring.a1.x, spring.a1.y]}
               closed={true}
+              strokeScaleEnabled={false}
               strokeWidth={0.3}
               stroke="black"
             />

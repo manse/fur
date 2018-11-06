@@ -10,8 +10,8 @@ const hues = [
 ];
 
 export class PartStore {
-  public id = Math.random();
-  public color = `#${hsv.hex([hues[Math.floor(Math.random() * hues.length)], 80, 90])}`;
+  public readonly id = Math.random();
+  public readonly color = `#${hsv.hex([hues[Math.floor(Math.random() * hues.length)], 80, 90])}`;
 
   @observable
   public fragmentStores: FragmentStore[] = [];

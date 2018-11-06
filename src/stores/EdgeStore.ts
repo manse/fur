@@ -8,6 +8,10 @@ export class EdgeStore {
     return (e.v0 === this.v0 && e.v1 === this.v1) || (e.v0 === this.v1 && e.v1 === this.v0);
   }
 
+  public containsVertices(v0: VertexStore, v1: VertexStore) {
+    return (v0 === this.v0 && v1 === this.v1) || (v0 === this.v1 && v1 === this.v0);
+  }
+
   public calcMinimumLength(p: Point2D) {
     const x0 = this.v0.projection.x;
     const y0 = this.v0.projection.y;

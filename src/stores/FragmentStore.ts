@@ -7,7 +7,7 @@ function sign(p1: Point2D, p2: Point2D, p3: Point2D) {
 }
 
 export class FragmentStore {
-  public id = Math.floor(Math.random() * 1e8).toString(36);
+  public readonly id = Math.floor(Math.random() * 1e12).toString(36);
   public edgeStores: EdgeStore[] = [];
   public vertexStores: VertexStore[] = [];
 
@@ -36,6 +36,12 @@ export class FragmentStore {
       (this.v1.projection.y - this.v0.projection.y) * (this.v2.projection.x - this.v1.projection.x) -
         (this.v1.projection.x - this.v0.projection.x) * (this.v2.projection.y - this.v1.projection.y) >
       0
+    );
+  }
+
+  public isClockwiseVertices(v0: VertexStore, v1: VertexStore) {
+    return (
+      (v0 === this.v0 && v1 === this.v1) || (v0 === this.v1 && v1 === this.v2) || (v0 === this.v2 && v1 === this.v0)
     );
   }
 
