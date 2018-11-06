@@ -11,7 +11,11 @@ import { BaseController } from './controllers/BaseController';
 import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import { AddMultiFragmentController, BaseMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
+import {
+  AddMultiFragmentController,
+  BaseMultiFragmentController,
+  RemoveMultiFragmentController,
+} from './controllers/MultiFragmentController';
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';
@@ -134,6 +138,8 @@ export class ModelRenderer extends React.Component<Props, State> {
       end(this.transformPointToProjection(e));
       window.removeEventListener('mousemove', mousemove);
       window.removeEventListener('mouseup', mouseup);
+      const partStore = this.props.partManagerStore.activePartStore;
+      partStore && partStore.refreshSimulation();
       this.updateController();
       this.dragging = false;
     };
