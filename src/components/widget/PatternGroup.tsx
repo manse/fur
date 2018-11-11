@@ -22,7 +22,7 @@ export const PatternGroup = compose<Props, Props>(
               closed={true}
               strokeScaleEnabled={false}
               strokeWidth={0.3}
-              stroke="black"
+              stroke="white"
             />
           );
         })}

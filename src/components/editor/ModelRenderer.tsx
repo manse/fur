@@ -175,13 +175,13 @@ export class ModelRenderer extends React.Component<Props, State> {
           color = toRGBA(partStores[0].color, clockwise ? 0.4 : 0.1);
           break;
         default:
-          color = toRGBA('#333333', clockwise ? 0.4 : 0.1);
+          color = toRGBA('#aaaaaa', clockwise ? 0.4 : 0.1);
       }
       return (
         <Line
           key={i}
           strokeWidth={0.15}
-          stroke={clockwise ? 'black' : 'rgba(0,0,0,0.1)'}
+          stroke={clockwise ? 'white' : 'rgba(255,255,255,0.2)'}
           fill={color}
           closed={true}
           points={[
