@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { EdgeStore } from '../../../stores/EdgeStore';
-import { Point2D } from '../../../utils/vo';
+import { Point2D } from '../../../utils/geometry';
 import { BaseController } from './BaseController';
 
 export class EdgeController extends BaseController {

@@ -1,7 +1,7 @@
 import { observable, runInAction } from 'mobx';
 import { FragmentStore } from '../../../stores/FragmentStore';
 import { PartStore } from '../../../stores/PartStore';
-import { Point2D } from '../../../utils/vo';
+import { Point2D } from '../../../utils/geometry';
 import { BaseController } from './BaseController';
 
 export abstract class BaseMultiFragmentController extends BaseController {

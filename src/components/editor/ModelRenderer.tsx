@@ -5,17 +5,13 @@ import { EdgeStore } from '../../stores/EdgeStore';
 import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
 import { lighten, toRGBA } from '../../utils/color';
-import { Point2D } from '../../utils/vo';
+import { Point2D } from '../../utils/geometry';
 import { ModelCheatSheet } from './CheatSheet';
 import { BaseController } from './controllers/BaseController';
 import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import {
-  AddMultiFragmentController,
-  BaseMultiFragmentController,
-  RemoveMultiFragmentController,
-} from './controllers/MultiFragmentController';
+import { AddMultiFragmentController, BaseMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';

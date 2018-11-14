@@ -1,11 +1,11 @@
 import { observable } from 'mobx';
+import { Point3D } from '../utils/geometry';
 import { project } from '../utils/m4';
-import { Point3D } from '../utils/vo';
 
 export class VertexStore {
   public id = Math.floor(Math.random() * 1e12).toString(36);
   @observable
-  public projection: Point3D = { x: 0, y: 0, z: 0 };
+  public projection = { x: 0, y: 0, z: 0 };
 
   constructor(public position: Point3D) {
     this.projection.x = position.x;

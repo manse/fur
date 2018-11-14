@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { FragmentStore } from '../../../stores/FragmentStore';
-import { Point2D } from '../../../utils/vo';
+import { Point2D } from '../../../utils/geometry';
 import { BaseController } from './BaseController';
 
 export class FragmentController extends BaseController {

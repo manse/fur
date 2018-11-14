@@ -1,6 +1,6 @@
 import { action } from 'mobx';
+import { Point2D } from '../utils/geometry';
 import { identity, multiply, rotationX, rotationY, scaling } from '../utils/m4';
-import { Point2D } from '../utils/vo';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { VertexStore } from './VertexStore';

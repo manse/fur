@@ -1,4 +1,4 @@
-import { Point2D } from '../utils/vo';
+import { Point2D } from '../utils/geometry';
 import { VertexStore } from './VertexStore';
 
 export class EdgeStore {

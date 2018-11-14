@@ -1,6 +1,6 @@
 import { ModelStore } from '../../../stores/ModelStore';
 import { PartManagerStore } from '../../../stores/PartManagerStore';
-import { Point2D } from '../../../utils/vo';
+import { Point2D } from '../../../utils/geometry';
 
 export abstract class BaseController {
   protected modelStore: ModelStore;
