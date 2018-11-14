@@ -108,16 +108,12 @@ class Plate {
 export class SimulationStore {
   @observable
   public plates: Plate[] = [];
-  @observable
-  public progress: number = 0;
   private constraints: Constraint[];
-  private initialThickness: number;
 
   constructor(private fragmentStores: FragmentStore[], private edgeStores: EdgeStore[]) {}
 
   @action
   public reset() {
-    this.progress = 0;
     if (!this.fragmentStores.length) return;
     this.plates = this.fragmentStores.map(
       fragment => new Plate(fragment, new Anchor(fragment.v0), new Anchor(fragment.v1), new Anchor(fragment.v2)),
@@ -127,7 +123,6 @@ export class SimulationStore {
     this.buildVerticesDistanceConstraint();
     this.buildPlateRelation();
     this.resetAttitude();
-    this.initialThickness = this.getThickness();
   }
 
   @action
@@ -138,12 +133,6 @@ export class SimulationStore {
     this.plates.map(plate => plate.generateRotationPatch()).forEach(fn => fn());
     times(() => this.constraints.forEach(constraint => constraint.apply()), 50);
     this.plates.forEach(plate => plate.invalidate());
-    this.progress = 1 - this.getThickness() / (this.initialThickness || 0.001);
-  }
-
-  private getThickness() {
-    const bounding = this.getBounding();
-    return bounding.max.z - bounding.min.z;
   }
 
   public getBounding() {

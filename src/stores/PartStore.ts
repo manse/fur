@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { SimulationStore } from './SimulationStore';
@@ -27,12 +27,14 @@ export class PartStore {
     return this.indexOfEdgeStore(dart) !== -1;
   }
 
+  @action
   public addFragment(fragment: FragmentStore) {
     if (this.includesFragmentStore(fragment)) return;
     this.fragmentStores.push(fragment);
     this.simulationStore.reset();
   }
 
+  @action
   public removeFragment(fragment: FragmentStore) {
     const index = this.fragmentStores.indexOf(fragment);
     if (index >= 0) {
@@ -41,12 +43,14 @@ export class PartStore {
     }
   }
 
+  @action
   public addEdge(edge: EdgeStore) {
     if (this.includesEdge(edge)) return;
     this.edgeStores.push(edge);
     this.simulationStore.reset();
   }
 
+  @action
   public removeEdge(edge: EdgeStore) {
     const index = this.indexOfEdgeStore(edge);
     if (index === -1) return;

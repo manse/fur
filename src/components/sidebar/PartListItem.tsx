@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import { Layer, Stage } from 'react-konva';
 import { PartStore } from '../../stores/PartStore';
-import { SimulationProgress } from '../editor/SimulationProgress';
 import { PatternGroup } from '../widget/PatternGroup';
 import './styles/PartListItem.pcss';
 
@@ -19,6 +18,5 @@ export const PartListItem = observer(({ partStore, active, onClick }: Props) => 
         <PatternGroup partStore={partStore} size={300 * 0.7} />
       </Layer>
     </Stage>
-    <SimulationProgress progress={partStore.simulationStore.progress} size="small" />
   </div>
 ));

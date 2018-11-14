@@ -15,7 +15,6 @@ export const Toolbar = compose<Props, Props>(
   const noop = () => {};
   const handleClickAddPart = () => partManagerStore.addPartStore();
   const handleClickDeletePart = () => partManagerStore.removeActivePartStore();
-  const handleClickRegenerate = () => partManagerStore.refreshActivePartStore();
   const handleClickSave = () => partManagerStore.saveActivePartStoreAsImage();
   return (
     <div styleName="base">
@@ -25,7 +24,6 @@ export const Toolbar = compose<Props, Props>(
         <IconButton icon="trash" disabled={!partManagerStore.activePartStore} onClick={handleClickDeletePart} />
       </div>
       <div styleName="right">
-        <IconButton icon="refresh" disabled={!partManagerStore.activePartStore} onClick={handleClickRegenerate} />
         <IconButton icon="download" disabled={!partManagerStore.activePartStore} onClick={handleClickSave} />
       </div>
     </div>

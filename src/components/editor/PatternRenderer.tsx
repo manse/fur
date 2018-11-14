@@ -5,7 +5,6 @@ import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
 import { PatternGroup } from '../widget/PatternGroup';
 import { PatternCheatSheet } from './CheatSheet';
-import { SimulationProgress } from './SimulationProgress';
 
 type Props = {
   modelStore?: ModelStore;
@@ -90,13 +89,6 @@ export class PatternRenderer extends React.Component<Props, State> {
             ) : null}
           </Layer>
         </Stage>
-        <SimulationProgress
-          progress={
-            this.props.partManagerStore.activePartStore
-              ? this.props.partManagerStore.activePartStore.simulationStore.progress
-              : 0
-          }
-        />
         <PatternCheatSheet shift={this.state.shift} />
       </div>
     );

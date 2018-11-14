@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { getPartColor } from '../utils/color';
 import { FragmentStore } from './FragmentStore';
 import { PartStore } from './PartStore';
@@ -9,6 +9,12 @@ export class PartManagerStore {
   @observable
   public activePartStore: PartStore;
 
+  @action
+  public clear() {
+    this.partStores = [];
+  }
+
+  @action
   public addPartStore() {
     const partStore = new PartStore();
     partStore.color = getPartColor(this.partStores.length * 0.45);
@@ -18,19 +24,17 @@ export class PartManagerStore {
     }
   }
 
+  @action
   public setActivePartStore(partStore: PartStore) {
     this.activePartStore = partStore;
   }
 
+  @action
   public removeActivePartStore() {
     if (!this.activePartStore) return;
     const index = this.partStores.indexOf(this.activePartStore);
     this.partStores.splice(index, 1);
     this.activePartStore = this.partStores[index] || this.partStores[index - 1] || this.partStores[0] || undefined;
-  }
-
-  public refreshActivePartStore() {
-    if (!this.activePartStore) return;
   }
 
   public saveActivePartStoreAsImage() {
