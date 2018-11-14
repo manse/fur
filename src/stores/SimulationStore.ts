@@ -8,8 +8,7 @@ import { VertexStore } from './VertexStore';
 function noop() {}
 
 class Constraint {
-  private static readonly FACTOR = 0.4;
-  constructor(public a0: Anchor, public a1: Anchor, private distance: number) {}
+  constructor(public a0: Anchor, public a1: Anchor, private distance: number, private factor: number) {}
 
   public apply() {
     const diff = new THREE.Vector3(
@@ -19,7 +18,7 @@ class Constraint {
     );
     const r = diff.length();
     const delta = this.distance - r;
-    this.a0.vector.add(diff.multiplyScalar(delta * Constraint.FACTOR));
+    this.a0.vector.add(diff.multiplyScalar(delta * this.factor));
     this.a1.vector.add(diff.multiplyScalar(-1));
   }
 
@@ -176,9 +175,9 @@ export class SimulationStore {
   private buildEdgeLengthConstraint() {
     this.plates.forEach(({ a0, a1, a2 }) => {
       this.constraints.push(
-        new Constraint(a0, a1, a0.vertexStore.length(a1.vertexStore)),
-        new Constraint(a1, a2, a1.vertexStore.length(a2.vertexStore)),
-        new Constraint(a2, a0, a2.vertexStore.length(a0.vertexStore)),
+        new Constraint(a0, a1, a0.vertexStore.length(a1.vertexStore), 0.01),
+        new Constraint(a1, a2, a1.vertexStore.length(a2.vertexStore), 0.01),
+        new Constraint(a2, a0, a2.vertexStore.length(a0.vertexStore), 0.01),
       );
     });
   }
@@ -197,10 +196,10 @@ export class SimulationStore {
         const pairs = fromPlate.findAnchorPairs(toPlate);
         pairs
           .filter(([a, b]) => !this.constraintExistsBetween(a, b))
-          .forEach(([a, b]) => this.constraints.push(new Constraint(a, b, 0)));
+          .forEach(([a, b]) => this.constraints.push(new Constraint(a, b, 0, 0.33)));
         const ra0 = fromPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
         const ra1 = toPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
-        this.constraints.push(new Constraint(ra0, ra1, ra0.vertexStore.length(ra1.vertexStore)));
+        this.constraints.push(new Constraint(ra0, ra1, ra0.vertexStore.length(ra1.vertexStore), 0.01));
         if (visited.includes(toFragment)) return;
         visited.push(toFragment);
         dig(toFragment);
