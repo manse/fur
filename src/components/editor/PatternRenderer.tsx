@@ -84,7 +84,7 @@ export class PatternRenderer extends React.Component<Props, State> {
             {this.props.partManagerStore.activePartStore ? (
               <PatternGroup
                 partStore={this.props.partManagerStore.activePartStore}
-                size={Math.min(this.state.width, this.state.height) * 0.75}
+                scale={(Math.min(this.state.width, this.state.height) / this.props.partManagerStore.getMaxSize()) * 0.8}
               />
             ) : null}
           </Layer>

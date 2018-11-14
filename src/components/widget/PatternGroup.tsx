@@ -7,16 +7,17 @@ import { toRGBA } from '../../utils/color';
 type Props = {
   partStore: PartStore;
   size?: number;
+  scale?: number;
 };
 
-export const PatternGroup = compose<Props, Props>(observer)(({ partStore, size }: Props) => {
+export const PatternGroup = compose<Props, Props>(observer)(({ partStore, size, scale }: Props) => {
   const bounding = partStore.simulationStore.getBounding();
   const dx = bounding.max.x - bounding.min.x;
   const dy = bounding.max.y - bounding.min.y;
-  const scale = size ? size / Math.max(dx, dy) : 100;
+  const scaleXY = size ? size / Math.max(dx, dy) : scale || 100;
   return (
     <Group
-      scale={{ x: scale, y: scale }}
+      scale={{ x: scaleXY, y: scaleXY }}
       offsetX={(bounding.max.x + bounding.min.x) / 2}
       offsetY={(bounding.max.y + bounding.min.y) / 2}
     >

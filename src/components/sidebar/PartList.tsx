@@ -19,7 +19,7 @@ export const PartList = compose<Props, Props>(
         <PartListItem
           partStore={partStore}
           active={partStore === partManagerStore.activePartStore}
-          key={partStore.id}
+          key={partStore.id + partStore.simulationStore.key}
           onClick={handleClick}
         />
       );

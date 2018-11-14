@@ -99,6 +99,7 @@ class Plate {
     return this.anchors.find(a => a.vertexStore !== a0.vertexStore && a.vertexStore !== a1.vertexStore);
   }
 
+  @action
   public invalidate() {
     this.key = Math.random();
   }
@@ -107,6 +108,8 @@ class Plate {
 export class SimulationStore {
   @observable
   public plates: Plate[] = [];
+  @observable
+  public key = Math.random();
   private constraints: Constraint[];
 
   constructor(private fragmentStores: FragmentStore[], private edgeStores: EdgeStore[]) {}
@@ -131,7 +134,7 @@ export class SimulationStore {
     this.plates.forEach(plate => plate.updateNormals());
     this.plates.map(plate => plate.generateRotationPatch()).forEach(fn => fn());
     times(() => this.constraints.forEach(constraint => constraint.apply()), 50);
-    this.plates.forEach(plate => plate.invalidate());
+    this.invalidate();
   }
 
   public getBounding() {
@@ -157,6 +160,12 @@ export class SimulationStore {
         z: Math.max(...maxPoints.map(({ z }) => z)),
       },
     };
+  }
+
+  @action
+  public invalidate() {
+    this.key = Math.random();
+    this.plates.forEach(plate => plate.invalidate());
   }
 
   private getRootFragment() {

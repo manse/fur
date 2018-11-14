@@ -44,4 +44,13 @@ export class PartManagerStore {
   public filterPartStoresByFragment(fragment: FragmentStore) {
     return this.partStores.filter(part => part.includesFragmentStore(fragment));
   }
+
+  public getMaxSize() {
+    return Math.max(
+      ...this.partStores.reduce<number[]>((acc, store) => {
+        const bounding = store.simulationStore.getBounding();
+        return [...acc, bounding.max.x - bounding.min.x, bounding.max.y - bounding.min.y];
+      }, []),
+    );
+  }
 }
