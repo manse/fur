@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { PartList } from '../sidebar/PartList';
-import { Toolbar } from '../sidebar/Toolbar';
+import { PartList } from './PartList';
 import './styles/Sidebar.pcss';
+import { Toolbar } from './Toolbar';
 
 export const Sidebar = () => (
   <div styleName="base">

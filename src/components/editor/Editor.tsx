@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ModelRenderer } from '../editor/ModelRenderer';
-import { PatternRenderer } from '../editor/PatternRenderer';
 import { SegmentedControl } from '../widget/SegmentedControl';
+import { ModelRenderer } from './ModelRenderer';
+import { PatternRenderer } from './PatternRenderer';
 import './styles/Editor.pcss';
 
 enum Tab {
