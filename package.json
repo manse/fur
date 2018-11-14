@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "prod": "webpack --mode production",
-    "dev": "webpack-dev-server --hot --inline"
+    "dev": "webpack-dev-server --hot --inline",
+    "deploy": "sh ./scripts/deploy.sh"
   },
   "author": "manse",
   "license": "ISC",
