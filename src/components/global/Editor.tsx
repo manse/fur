@@ -29,6 +29,7 @@ export class Editor extends React.Component<{}, State> {
       <div styleName="base">
         {this.state.tab === Tab.model ? <ModelRenderer /> : null}
         {this.state.tab === Tab.pattern ? <PatternRenderer /> : null}
+        <h1 styleName="logo">fur</h1>
         <div styleName="display-switch">
           <SegmentedControl
             items={['Model', 'Pattern']}

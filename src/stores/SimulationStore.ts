@@ -108,13 +108,16 @@ class Plate {
 export class SimulationStore {
   @observable
   public plates: Plate[] = [];
-
+  @observable
+  public progress: number = 0;
   private constraints: Constraint[];
+  private initialThickness: number;
 
   constructor(private fragmentStores: FragmentStore[], private edgeStores: EdgeStore[]) {}
 
   @action
   public reset() {
+    this.progress = 0;
     if (!this.fragmentStores.length) return;
     this.plates = this.fragmentStores.map(
       fragment => new Plate(fragment, new Anchor(fragment.v0), new Anchor(fragment.v1), new Anchor(fragment.v2)),
@@ -124,15 +127,48 @@ export class SimulationStore {
     this.buildVerticesDistanceConstraint();
     this.buildPlateRelation();
     this.resetAttitude();
+    this.initialThickness = this.getThickness();
   }
 
   @action
   public iterate() {
+    if (!this.fragmentStores.length) return;
     this.resetAttitude();
     this.plates.forEach(plate => plate.updateNormals());
     this.plates.map(plate => plate.generateRotationPatch()).forEach(fn => fn());
     times(() => this.constraints.forEach(constraint => constraint.apply()), 50);
     this.plates.forEach(plate => plate.invalidate());
+    this.progress = 1 - this.getThickness() / (this.initialThickness || 0.001);
+  }
+
+  private getThickness() {
+    const bounding = this.getBounding();
+    return bounding.max.z - bounding.min.z;
+  }
+
+  public getBounding() {
+    const minPoints = this.plates.map(p => ({
+      x: Math.min(p.a0.vector.x, p.a1.vector.x, p.a2.vector.x),
+      y: Math.min(p.a0.vector.y, p.a1.vector.y, p.a2.vector.y),
+      z: Math.min(p.a0.vector.z, p.a1.vector.z, p.a2.vector.z),
+    }));
+    const maxPoints = this.plates.map(p => ({
+      x: Math.max(p.a0.vector.x, p.a1.vector.x, p.a2.vector.x),
+      y: Math.max(p.a0.vector.y, p.a1.vector.y, p.a2.vector.y),
+      z: Math.max(p.a0.vector.z, p.a1.vector.z, p.a2.vector.z),
+    }));
+    return {
+      min: {
+        x: Math.min(...minPoints.map(({ x }) => x)),
+        y: Math.min(...minPoints.map(({ y }) => y)),
+        z: Math.min(...minPoints.map(({ z }) => z)),
+      },
+      max: {
+        x: Math.max(...maxPoints.map(({ x }) => x)),
+        y: Math.max(...maxPoints.map(({ y }) => y)),
+        z: Math.max(...maxPoints.map(({ z }) => z)),
+      },
+    };
   }
 
   private getRootFragment() {

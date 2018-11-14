@@ -35,27 +35,27 @@ export class PartStore {
   public addFragment(fragment: FragmentStore) {
     if (this.includesFragmentStore(fragment)) return;
     this.fragmentStores.push(fragment);
+    this.simulationStore.reset();
   }
 
   public removeFragment(fragment: FragmentStore) {
     const index = this.fragmentStores.indexOf(fragment);
     if (index >= 0) {
       this.fragmentStores.splice(index, 1);
+      this.simulationStore.reset();
     }
   }
 
   public addEdge(edge: EdgeStore) {
     if (this.includesEdge(edge)) return;
     this.edgeStores.push(edge);
+    this.simulationStore.reset();
   }
 
   public removeEdge(edge: EdgeStore) {
     const index = this.indexOfEdgeStore(edge);
     if (index === -1) return;
     this.edgeStores.splice(index, 1);
-  }
-
-  public refreshSimulation() {
     this.simulationStore.reset();
   }
 }

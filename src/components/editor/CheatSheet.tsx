@@ -5,10 +5,7 @@ import { FragmentController } from './controllers/FragmentController';
 import { AddMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
 import './styles/CheatSheet.pcss';
 
-type Props = {
-  controller: BaseController;
-};
-export const CheatSheet = ({ controller }: Props) => (
+export const ModelCheatSheet = ({ controller }: { controller: BaseController }) => (
   <div styleName="base">
     <dl styleName={controller instanceof DefaultController ? 'active' : ''}>
       <dt>Click</dt>
@@ -29,6 +26,15 @@ export const CheatSheet = ({ controller }: Props) => (
     <dl styleName={controller instanceof EdgeController ? 'active' : ''}>
       <dt>Command + Click</dt>
       <dd>Pick or unpick darts</dd>
+    </dl>
+  </div>
+);
+
+export const PatternCheatSheet = ({ shift }: { shift: boolean }) => (
+  <div styleName="base">
+    <dl styleName={shift ? 'active' : ''}>
+      <dt>Shift</dt>
+      <dd>Iterate simulation</dd>
     </dl>
   </div>
 );

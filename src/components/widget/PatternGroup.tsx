@@ -1,23 +1,30 @@
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Group, Line } from 'react-konva';
 import { compose } from 'recompose';
-import { PartManagerStore } from '../../stores/PartManagerStore';
+import { PartStore } from '../../stores/PartStore';
+import { toRGBA } from '../../utils/color';
 
 type Props = {
-  partManagerStore?: PartManagerStore;
+  partStore: PartStore;
+  size?: number;
 };
 
-export const PatternGroup = compose<Props, Props>(
-  inject('partManagerStore'),
-  observer,
-)(({ partManagerStore: { activePartStore } }) => {
-  if (!activePartStore) return <Group />;
+export const PatternGroup = compose<Props, Props>(observer)(({ partStore, size }: Props) => {
+  const bounding = partStore.simulationStore.getBounding();
+  const dx = bounding.max.x - bounding.min.x;
+  const dy = bounding.max.y - bounding.min.y;
+  const scale = size ? size / Math.max(dx, dy) : 100;
   return (
-    <Group scale={{ x: 100, y: 100 }}>
-      {activePartStore.simulationStore.plates.map(plate => {
+    <Group
+      scale={{ x: scale, y: scale }}
+      offsetX={(bounding.max.x + bounding.min.x) / 2}
+      offsetY={(bounding.max.y + bounding.min.y) / 2}
+    >
+      {partStore.simulationStore.plates.map(plate => {
         return (
           <Line
             key={plate.key}
+            fill={toRGBA(partStore.color, 0.4)}
             points={[
               plate.a0.vector.x,
               plate.a0.vector.y,

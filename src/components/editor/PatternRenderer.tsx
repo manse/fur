@@ -4,6 +4,8 @@ import { Layer, Stage } from 'react-konva';
 import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
 import { PatternGroup } from '../widget/PatternGroup';
+import { PatternCheatSheet } from './CheatSheet';
+import { SimulationProgress } from './SimulationProgress';
 
 type Props = {
   modelStore?: ModelStore;
@@ -13,6 +15,7 @@ type Props = {
 type State = {
   width: number;
   height: number;
+  shift: boolean;
 };
 
 @inject('modelStore', 'partManagerStore')
@@ -21,6 +24,7 @@ export class PatternRenderer extends React.Component<Props, State> {
   public state = {
     width: 0,
     height: 0,
+    shift: false,
   };
 
   private ref: HTMLDivElement;
@@ -53,8 +57,11 @@ export class PatternRenderer extends React.Component<Props, State> {
         const partStore = this.props.partManagerStore.activePartStore;
         if (!partStore) return;
         partStore.simulationStore.iterate();
-      }, 10);
+      }, 5);
     }
+    this.setState({
+      shift: e.shiftKey,
+    });
   };
 
   private updateCanvasSize() {
@@ -75,9 +82,19 @@ export class PatternRenderer extends React.Component<Props, State> {
       <div ref={this.handleRef}>
         <Stage width={this.state.width} height={this.state.height}>
           <Layer x={this.state.width / 2} y={this.state.height / 2}>
-            <PatternGroup />
+            {this.props.partManagerStore.activePartStore ? (
+              <PatternGroup partStore={this.props.partManagerStore.activePartStore} />
+            ) : null}
           </Layer>
         </Stage>
+        <SimulationProgress
+          progress={
+            this.props.partManagerStore.activePartStore
+              ? this.props.partManagerStore.activePartStore.simulationStore.progress
+              : 0
+          }
+        />
+        <PatternCheatSheet shift={this.state.shift} />
       </div>
     );
   }

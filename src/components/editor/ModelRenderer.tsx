@@ -6,16 +6,12 @@ import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
 import { ligten, toRGBA } from '../../utils/color';
 import { Point2D } from '../../utils/vo';
-import { CheatSheet } from './CheatSheet';
+import { ModelCheatSheet } from './CheatSheet';
 import { BaseController } from './controllers/BaseController';
 import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import {
-  AddMultiFragmentController,
-  BaseMultiFragmentController,
-  RemoveMultiFragmentController,
-} from './controllers/MultiFragmentController';
+import { AddMultiFragmentController, BaseMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';
@@ -138,8 +134,6 @@ export class ModelRenderer extends React.Component<Props, State> {
       end(this.transformPointToProjection(e));
       window.removeEventListener('mousemove', mousemove);
       window.removeEventListener('mouseup', mouseup);
-      const partStore = this.props.partManagerStore.activePartStore;
-      partStore && partStore.refreshSimulation();
       this.updateController();
       this.dragging = false;
     };
@@ -162,20 +156,22 @@ export class ModelRenderer extends React.Component<Props, State> {
     const clockwiseEdges: EdgeStore[] = [];
     const fragments = this.props.modelStore.fragmentStores.map((fragment, i) => {
       const partStores = this.props.partManagerStore.filterPartStoresByFragment(fragment);
+      const active = partStores.some(partStore => this.props.partManagerStore.activePartStore === partStore);
       const clockwise = fragment.isClockwise();
       if (clockwise) {
         clockwiseEdges.push(...fragment.edgeStores);
       }
+      const opacity = (clockwise ? 0.6 : 0.1) * (active ? 1 : 0.25);
       let color: string = null;
       switch (partStores.length) {
         case 0:
           color = null;
           break;
         case 1:
-          color = toRGBA(partStores[0].color, clockwise ? 0.4 : 0.1);
+          color = toRGBA(partStores[0].color, opacity);
           break;
         default:
-          color = toRGBA('#aaaaaa', clockwise ? 0.4 : 0.1);
+          color = toRGBA('#aaaaaa', opacity);
       }
       return (
         <Line
@@ -220,7 +216,7 @@ export class ModelRenderer extends React.Component<Props, State> {
 
     return (
       <div ref={this.handleRef}>
-        <CheatSheet controller={this.controller} key={this.state.controllerId} />
+        <ModelCheatSheet controller={this.controller} key={this.state.controllerId} />
         <Stage width={this.state.width} height={this.state.height}>
           <Layer x={this.state.width / 2} y={this.state.height / 2}>
             {fragments}
