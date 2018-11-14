@@ -8,6 +8,8 @@ export class PartManagerStore {
   public partStores: PartStore[] = [];
   @observable
   public activePartStore: PartStore;
+  @observable
+  public downloadKey = Math.random();
 
   @action
   public clear() {
@@ -37,8 +39,10 @@ export class PartManagerStore {
     this.activePartStore = this.partStores[index] || this.partStores[index - 1] || this.partStores[0] || undefined;
   }
 
+  @action
   public saveActivePartStoreAsImage() {
     if (!this.activePartStore) return;
+    this.downloadKey = Math.random();
   }
 
   public filterPartStoresByFragment(fragment: FragmentStore) {

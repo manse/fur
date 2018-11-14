@@ -1,3 +1,4 @@
+import { Lambda, observe } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { Layer, Stage } from 'react-konva';
@@ -28,12 +29,16 @@ export class PatternRenderer extends React.Component<Props, State> {
 
   private ref: HTMLDivElement;
   private timerId: number;
+  private disposer: Lambda;
 
   public componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyboard);
     window.addEventListener('keyup', this.handleKeyboard);
     this.handleResize();
+    this.disposer = observe(this.props.partManagerStore.downloadKey, () => {
+      console.log('download');
+    });
     setTimeout(() => this.updateCanvasSize(), 100); // @TODO
   }
 
@@ -41,6 +46,7 @@ export class PatternRenderer extends React.Component<Props, State> {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyboard);
     window.removeEventListener('keyup', this.handleKeyboard);
+    this.disposer();
   }
 
   private handleRef = (ref: HTMLDivElement) => {
