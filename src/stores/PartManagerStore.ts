@@ -1,4 +1,5 @@
 import { observable } from 'mobx';
+import { getPartColor } from '../utils/color';
 import { FragmentStore } from './FragmentStore';
 import { PartStore } from './PartStore';
 
@@ -10,6 +11,7 @@ export class PartManagerStore {
 
   public addPartStore() {
     const partStore = new PartStore();
+    partStore.color = getPartColor(this.partStores.length * 0.45);
     this.partStores.push(partStore);
     if (this.partStores.length === 1) {
       this.activePartStore = partStore;

@@ -4,7 +4,7 @@ import { Layer, Line, Stage } from 'react-konva';
 import { EdgeStore } from '../../stores/EdgeStore';
 import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
-import { ligten, toRGBA } from '../../utils/color';
+import { lighten, toRGBA } from '../../utils/color';
 import { Point2D } from '../../utils/vo';
 import { ModelCheatSheet } from './CheatSheet';
 import { BaseController } from './controllers/BaseController';
@@ -198,7 +198,7 @@ export class ModelRenderer extends React.Component<Props, State> {
           <Line
             key={i * 10000 + j}
             strokeWidth={3}
-            stroke={toRGBA(ligten(partStore.color, 2), clockwiseEdges.find(e => edge.equals(e)) ? 1 : 0.1)}
+            stroke={toRGBA(lighten(partStore.color, 2), clockwiseEdges.find(e => edge.equals(e)) ? 1 : 0.1)}
             points={[edge.v0.projection.x, edge.v0.projection.y, edge.v1.projection.x, edge.v1.projection.y]}
           />
         )),
