@@ -55,6 +55,12 @@ const dependencies = [
     to: `${md5('konva' + now)}.js`,
     module: 'konva',
     global: 'Konva'
+  },
+  {
+    from: 'node_modules/three/build/three.min.js',
+    to: `${md5('three' + now)}.js`,
+    module: 'three',
+    global: 'THREE'
   }
 ];
 const rules = [
