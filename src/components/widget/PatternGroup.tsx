@@ -10,24 +10,29 @@ type Props = {
 export const PatternGroup = compose<Props, Props>(
   inject('partManagerStore'),
   observer,
-)(
-  ({ partManagerStore: { activePartStore } }) =>
-    activePartStore ? (
-      <Group scale={{ x: 100, y: 100 }}>
-        {activePartStore.simulationStore.springStores.map(spring => {
-          return (
-            <Line
-              key={spring.id}
-              points={[spring.a0.x, spring.a0.y, spring.a1.x, spring.a1.y]}
-              closed={true}
-              strokeScaleEnabled={false}
-              strokeWidth={0.3}
-              stroke="white"
-            />
-          );
-        })}
-      </Group>
-    ) : (
-      <Group />
-    ),
-);
+)(({ partManagerStore: { activePartStore } }) => {
+  if (!activePartStore) return <Group />;
+  return (
+    <Group scale={{ x: 100, y: 100 }}>
+      {activePartStore.simulationStore.plates.map(plate => {
+        return (
+          <Line
+            key={plate.key}
+            points={[
+              plate.a0.vector.x,
+              plate.a0.vector.y,
+              plate.a1.vector.x,
+              plate.a1.vector.y,
+              plate.a2.vector.x,
+              plate.a2.vector.y,
+            ]}
+            closed={true}
+            strokeScaleEnabled={false}
+            strokeWidth={0.3}
+            stroke="white"
+          />
+        );
+      })}
+    </Group>
+  );
+});

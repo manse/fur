@@ -1,202 +1,216 @@
-import { action, computed, observable } from 'mobx';
+import { action, observable } from 'mobx';
+import { times } from 'ramda';
+import * as THREE from 'three';
 import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { VertexStore } from './VertexStore';
 
-function pow2(n: number) {
-  return n * n;
-}
+function noop() {}
 
-function length(x0: number, y0: number, x1: number, y1: number) {
-  const dx = x0 - x1;
-  const dy = y0 - y1;
-  return Math.sqrt(dx * dx + dy * dy);
-}
+class Constraint {
+  private static readonly FACTOR = 0.4;
+  constructor(public a0: Anchor, public a1: Anchor, private distance: number) {}
 
-function calcCirclesIntersection(
-  x0: number,
-  y0: number,
-  r0: number,
-  x1: number,
-  y1: number,
-  r1: number,
-  counterClockwise: boolean,
-): [number, number] {
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const d = Math.sqrt(dx * dx + dy * dy);
-  if (d > r0 + r1) return null;
-  if (d < Math.abs(r0 - r1)) return null;
-  const a = (r0 * r0 - r1 * r1 + d * d) / (2 * d);
-  const x2 = x0 + (dx * a) / d;
-  const y2 = y0 + (dy * a) / d;
-  const h = Math.sqrt(r0 * r0 - a * a);
-  const rx = -dy * (h / d);
-  const ry = dx * (h / d);
-  return counterClockwise ? [x2 + rx, y2 + ry] : [x2 - rx, y2 - ry];
-}
-
-function calcCirclesIntersectionFallback(
-  x0: number,
-  y0: number,
-  r0: number,
-  x1: number,
-  y1: number,
-  r1: number,
-  counterClockwise: boolean,
-): [number, number] {
-  const [u, v] = r0 > r1 ? [0.5, 1] : [1, 0.5];
-  for (let i = 0, s = 1, t = 1; i < 100; i += 1, s += u, t += v) {
-    const intersection = calcCirclesIntersection(x0, y0, r0 * s, x1, y1, r1 * t, counterClockwise);
-    if (intersection) return intersection;
-  }
-  return [(x0 + x1) / 2, (y0 + y1) / 2];
-}
-
-class AnchorStore {
-  @observable
-  public x = 0;
-  @observable
-  public y = 0;
-
-  constructor(public vertexStore: VertexStore, x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-
-  @action
-  public translate(dx: number, dy: number) {
-    this.x += dx;
-    this.y += dy;
-  }
-}
-
-class SpringStore {
-  public readonly id = Math.floor(Math.random() * 1e12).toString(36);
-  public readonly eqLength: number;
-
-  constructor(public a0: AnchorStore, public a1: AnchorStore) {
-    this.eqLength = a0.vertexStore.length(a1.vertexStore);
-  }
-
-  @computed
-  public get length() {
-    return length(this.a0.x, this.a0.y, this.a1.x, this.a1.y);
-  }
-
-  public equalsToEdge(edge: EdgeStore) {
-    return this.containsVertices(edge.v0, edge.v1);
-  }
-
-  public containsVertices(v0: VertexStore, v1: VertexStore) {
-    return (
-      (v0 === this.a0.vertexStore && v1 === this.a1.vertexStore) ||
-      (v0 === this.a1.vertexStore && v1 === this.a0.vertexStore)
+  public apply() {
+    const diff = new THREE.Vector3(
+      this.a0.vector.x - this.a1.vector.x,
+      this.a0.vector.y - this.a1.vector.y,
+      this.a0.vector.z - this.a1.vector.z,
     );
+    const r = diff.length();
+    const delta = this.distance - r;
+    this.a0.vector.add(diff.multiplyScalar(delta * Constraint.FACTOR));
+    this.a1.vector.add(diff.multiplyScalar(-1));
   }
 
-  public findAnchorByVertex(v: VertexStore): AnchorStore {
-    if (v === this.a0.vertexStore) return this.a0;
-    if (v === this.a1.vertexStore) return this.a1;
-    return undefined;
+  public equals(a0: Anchor, a1: Anchor) {
+    return (a0 === this.a0 && a1 === this.a1) || (a0 === this.a1 && a1 === this.a0);
+  }
+}
+
+class Anchor {
+  public readonly id = Math.floor(Math.random() * 1e12).toString(36);
+  public vector: THREE.Vector3;
+
+  constructor(public vertexStore: VertexStore) {
+    this.vector = new THREE.Vector3(vertexStore.position.x, vertexStore.position.y, vertexStore.position.z);
+  }
+}
+
+class Plate {
+  public readonly id = Math.floor(Math.random() * 1e12).toString(36);
+  @observable
+  public key = Math.random();
+  public parentPlates: Plate[] = [];
+  public anchors: Anchor[];
+  public geometry: THREE.Geometry;
+  public face: THREE.Face3;
+
+  constructor(public fragmentStore: FragmentStore, public a0: Anchor, public a1: Anchor, public a2: Anchor) {
+    this.anchors = [a0, a1, a2];
+    this.geometry = new THREE.Geometry();
+    this.geometry.vertices.push(a0.vector);
+    this.geometry.vertices.push(a1.vector);
+    this.geometry.vertices.push(a2.vector);
+    this.face = new THREE.Face3(0, 1, 2);
+    this.geometry.faces.push(this.face);
+    this.updateNormals();
+  }
+
+  public getCenter() {
+    return new THREE.Vector3()
+      .copy(this.a0.vector)
+      .add(this.a1.vector)
+      .add(this.a2.vector)
+      .multiplyScalar(1 / 3);
+  }
+
+  public updateNormals() {
+    this.geometry.computeFaceNormals();
+    this.geometry.computeVertexNormals();
+  }
+
+  public generateRotationPatch() {
+    if (!this.parentPlates.length) return noop;
+    const targetVector = this.parentPlates
+      .reduce((acc, parent) => new THREE.Vector3().addVectors(acc, parent.face.normal), new THREE.Vector3(0, 0, 0))
+      .multiplyScalar(1 / this.parentPlates.length)
+      .normalize();
+    const q = new THREE.Quaternion().setFromUnitVectors(this.face.normal, targetVector);
+    const center = this.getCenter();
+    const mat = new THREE.Matrix4()
+      .copy(new THREE.Matrix4().makeTranslation(center.x, center.y, center.z))
+      .multiply(new THREE.Matrix4().makeRotationFromQuaternion(q))
+      .multiply(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
+    return () => this.geometry.applyMatrix(mat);
+  }
+
+  public findAnchorPairs(plate: Plate): [[Anchor, Anchor], [Anchor, Anchor]] {
+    const results = this.anchors
+      .map(anchor => {
+        const pair = plate.anchors.find(a => a.vertexStore === anchor.vertexStore);
+        return pair && [anchor, pair];
+      })
+      .filter(id => id);
+    if (results.length !== 2) throw 0;
+    return results as any;
+  }
+
+  public getRestAnchor(a0: Anchor, a1: Anchor) {
+    return this.anchors.find(a => a.vertexStore !== a0.vertexStore && a.vertexStore !== a1.vertexStore);
+  }
+
+  public invalidate() {
+    this.key = Math.random();
   }
 }
 
 export class SimulationStore {
   @observable
-  public springStores: SpringStore[] = [];
+  public plates: Plate[] = [];
+
+  private constraints: Constraint[];
 
   constructor(private fragmentStores: FragmentStore[], private edgeStores: EdgeStore[]) {}
 
   @action
   public reset() {
     if (!this.fragmentStores.length) return;
-    const startFragment = this.findCenterFragment();
-    this.springStores = [];
-    console.log('======================');
-    this.buildInitialSprings(startFragment);
-    this.buildRestSprings(startFragment);
+    this.plates = this.fragmentStores.map(
+      fragment => new Plate(fragment, new Anchor(fragment.v0), new Anchor(fragment.v1), new Anchor(fragment.v2)),
+    );
+    this.constraints = [];
+    this.buildEdgeLengthConstraint();
+    this.buildVerticesDistanceConstraint();
+    this.buildPlateRelation();
+    this.resetAttitude();
   }
 
   @action
-  public iterate() {}
+  public iterate() {
+    this.resetAttitude();
+    this.plates.forEach(plate => plate.updateNormals());
+    this.plates.map(plate => plate.generateRotationPatch()).forEach(fn => fn());
+    times(() => this.constraints.forEach(constraint => constraint.apply()), 50);
+    this.plates.forEach(plate => plate.invalidate());
+  }
 
-  private findCenterFragment() {
-    // @TODO
+  private getRootFragment() {
     return this.fragmentStores[0];
   }
 
-  private buildInitialSprings(startFragment: FragmentStore) {
-    const { v0, v1, v2 } = startFragment;
-    const length01 = v0.length(v1);
-    const length12 = v1.length(v2);
-    const length20 = v2.length(v0);
-    const a0 = new AnchorStore(v0, 0, 0);
-    const a1 = new AnchorStore(v1, length01, 0);
-    const intersection = calcCirclesIntersectionFallback(0, 0, length20, length01, 0, length12, false);
-    const a2 = new AnchorStore(v2, ...intersection);
-    this.springStores.push(new SpringStore(a0, a1), new SpringStore(a1, a2), new SpringStore(a2, a0));
+  private getPlate(fragment: FragmentStore) {
+    return this.plates.find(plate => plate.fragmentStore === fragment);
   }
 
-  private buildRestSprings(startFragment: FragmentStore) {
-    const visitedFragments: FragmentStore[] = [startFragment];
-    const dig = (fragment: FragmentStore) => {
-      fragment.edgeStores.forEach(edge => {
-        this.fragmentStores.filter(f => !visitedFragments.includes(f)).forEach(f => {
-          const sharedEdge = f.edgeStores.find(e => e.equals(edge));
-          if (!sharedEdge || this.edgeStores.some(e => e.equals(sharedEdge))) return;
-          visitedFragments.push(f);
-          this.buildSpring(f, sharedEdge);
-          this.updateSprings();
-          this.updateSprings();
-          dig(f);
-        });
+  private constraintExistsBetween(a0: Anchor, a1: Anchor) {
+    const result = this.constraints.some(constraint => constraint.equals(a0, a1));
+    return result;
+  }
+
+  private buildEdgeLengthConstraint() {
+    this.plates.forEach(({ a0, a1, a2 }) => {
+      this.constraints.push(
+        new Constraint(a0, a1, a0.vertexStore.length(a1.vertexStore)),
+        new Constraint(a1, a2, a1.vertexStore.length(a2.vertexStore)),
+        new Constraint(a2, a0, a2.vertexStore.length(a0.vertexStore)),
+      );
+    });
+  }
+
+  private buildVerticesDistanceConstraint() {
+    const rootFragment = this.getRootFragment();
+    const visited = [rootFragment];
+    const dig = (fromFragment: FragmentStore) => {
+      fromFragment.edgeStores.filter(edge => !this.edgeStores.some(e => edge.equals(e))).forEach(searchEdge => {
+        const toFragment = this.fragmentStores.find(
+          fragment => fragment !== fromFragment && fragment.edgeStores.some(edge => edge.equals(searchEdge)),
+        );
+        if (!toFragment) return;
+        const fromPlate = this.plates.find(plate => plate.fragmentStore === fromFragment);
+        const toPlate = this.plates.find(plate => plate.fragmentStore === toFragment);
+        const pairs = fromPlate.findAnchorPairs(toPlate);
+        pairs
+          .filter(([a, b]) => !this.constraintExistsBetween(a, b))
+          .forEach(([a, b]) => this.constraints.push(new Constraint(a, b, 0)));
+        const ra0 = fromPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
+        const ra1 = toPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
+        this.constraints.push(new Constraint(ra0, ra1, ra0.vertexStore.length(ra1.vertexStore)));
+        if (visited.includes(toFragment)) return;
+        visited.push(toFragment);
+        dig(toFragment);
       });
     };
-    dig(startFragment);
+    dig(rootFragment);
   }
 
-  private buildSpring(fragment: FragmentStore, edge: EdgeStore) {
-    const restVertices = fragment.vertexStores.filter(vertex => vertex !== edge.v0 && vertex !== edge.v1);
-    if (restVertices.length !== 1) throw 0;
-    const toVertex = restVertices[0];
-
-    const fromSpring = this.springStores.find(spring => spring.equalsToEdge(edge));
-    if (!fromSpring) throw 0;
-
-    const isDart = [edge.v0, edge.v1].some(fromVertex =>
-      this.edgeStores.some(edge => edge.containsVertices(toVertex, fromVertex)),
-    );
-    let toAnchor: AnchorStore;
-    if (!isDart) {
-      toAnchor = this.springStores.map(spring => spring.findAnchorByVertex(toVertex)).filter(id => !!id)[0];
-    }
-    if (!toAnchor) {
-      const { a0, a1 } = fromSpring;
-      const intersection = calcCirclesIntersectionFallback(
-        a0.x,
-        a0.y,
-        a0.vertexStore.length(toVertex),
-        a1.x,
-        a1.y,
-        a1.vertexStore.length(toVertex),
-        !fragment.isClockwiseVertices(a0.vertexStore, a1.vertexStore),
-      );
-      toAnchor = new AnchorStore(toVertex, ...intersection);
-    }
-    this.springStores.push(new SpringStore(toAnchor, fromSpring.a0), new SpringStore(toAnchor, fromSpring.a1));
+  private buildPlateRelation() {
+    const expand = () => {
+      const next: FragmentStore[] = [];
+      lasts.forEach(parent => {
+        const parentPlate = this.getPlate(parent);
+        this.fragmentStores
+          .filter(fragment => !visited.includes(fragment))
+          .filter(fragment => fragment.edgeStores.some(edge => parent.containsEdge(edge)))
+          .forEach(child => {
+            this.getPlate(child).parentPlates.push(parentPlate);
+            if (next.includes(child)) return;
+            next.push(child);
+          });
+      });
+      visited.push(...next);
+      return next;
+    };
+    const rootFragment = this.getRootFragment();
+    const visited = [rootFragment];
+    let lasts = [rootFragment];
+    while ((lasts = expand()).length) {}
   }
 
-  private updateSprings() {
-    this.springStores
-      .map(spring => {
-        const { a0, a1 } = spring;
-        const factor = (spring.eqLength - spring.length) * 0.1;
-        return () => {
-          a0.translate((a0.x - a1.x) * factor, (a0.y - a1.y) * factor);
-          a1.translate((a1.x - a0.x) * factor, (a1.y - a0.y) * factor);
-        };
-      })
-      .forEach(fn => fn());
+  private resetAttitude() {
+    const initialPlate = this.getPlate(this.getRootFragment());
+    const q = new THREE.Quaternion().setFromUnitVectors(initialPlate.face.normal, new THREE.Vector3(0, 0, -1));
+    const mat = new THREE.Matrix4().makeRotationFromQuaternion(q);
+    this.plates.forEach(p => p.geometry.applyMatrix(mat));
   }
 }

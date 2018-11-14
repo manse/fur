@@ -202,7 +202,7 @@ export class ModelRenderer extends React.Component<Props, State> {
           <Line
             key={i * 10000 + j}
             strokeWidth={3}
-            stroke={toRGBA(ligten(partStore.color, 0.6), clockwiseEdges.find(e => edge.equals(e)) ? 1 : 0.1)}
+            stroke={toRGBA(ligten(partStore.color, 2), clockwiseEdges.find(e => edge.equals(e)) ? 1 : 0.1)}
             points={[edge.v0.projection.x, edge.v0.projection.y, edge.v1.projection.x, edge.v1.projection.y]}
           />
         )),
