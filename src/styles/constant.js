@@ -1,9 +1,9 @@
 module.exports = {
-  colorFill: '#22252c',
-  colorBorder: '#22252c',
+  colorFill: '#282C34',
+  colorBorder: '#212329',
   colorButton: '#6B7281',
   colorIcon: '#ACB5C9',
   colorText: '#D3DAE5',
   colorTextMute: '#666',
-  colorBackground: '#282c34'
+  colorBackground: '#30333A'
 };

@@ -1,20 +1,26 @@
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { Group, Line } from 'react-konva';
 import { compose } from 'recompose';
+import { PartManagerStore } from '../../stores/PartManagerStore';
 import { PartStore } from '../../stores/PartStore';
 import { toRGBA } from '../../utils/color';
 
 type Props = {
+  partManagerStore?: PartManagerStore;
   partStore: PartStore;
   size?: number;
-  scale?: number;
+  maxSize?: number;
 };
 
-export const PatternGroup = compose<Props, Props>(observer)(({ partStore, size, scale }: Props) => {
+export const PatternGroup = compose<Props, Props>(
+  inject('partManagerStore'),
+  observer,
+)(({ partManagerStore, partStore, size, maxSize }: Props) => {
   const bounding = partStore.simulationStore.getBounding();
   const dx = bounding.max.x - bounding.min.x;
   const dy = bounding.max.y - bounding.min.y;
-  const scaleXY = size ? size / Math.max(dx, dy) : scale || 100;
+  const scaleXY = size ? size / Math.max(dx, dy) : maxSize / partManagerStore.getMaxSize() || 100;
+
   return (
     <Group
       scale={{ x: scaleXY, y: scaleXY }}

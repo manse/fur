@@ -1,4 +1,5 @@
-import { Lambda, observe } from 'mobx';
+import { saveAs } from 'file-saver';
+import { autorun } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { Layer, Stage } from 'react-konva';
@@ -27,17 +28,26 @@ export class PatternRenderer extends React.Component<Props, State> {
     shift: false,
   };
 
-  private ref: HTMLDivElement;
+  private divRef: HTMLDivElement;
+  private stageRef: Stage;
   private timerId: number;
-  private disposer: Lambda;
+  private disposer: Function;
+  private lastDownloadKey: number = 0;
 
   public componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyboard);
     window.addEventListener('keyup', this.handleKeyboard);
     this.handleResize();
-    this.disposer = observe(this.props.partManagerStore.downloadKey, () => {
-      console.log('download');
+    this.disposer = autorun(() => {
+      if (this.stageRef && this.lastDownloadKey && this.lastDownloadKey !== this.props.partManagerStore.downloadKey) {
+        const canvas = this.stageRef
+          .getStage()
+          .getContent()
+          .querySelector('canvas');
+        canvas.toBlob(blob => saveAs(blob, `${new Date().toISOString()}.png`));
+      }
+      this.lastDownloadKey = this.props.partManagerStore.downloadKey;
     });
     setTimeout(() => this.updateCanvasSize(), 100); // @TODO
   }
@@ -49,10 +59,15 @@ export class PatternRenderer extends React.Component<Props, State> {
     this.disposer();
   }
 
-  private handleRef = (ref: HTMLDivElement) => {
+  private handleDivRef = (ref: HTMLDivElement) => {
     if (!ref) return;
-    this.ref = ref;
+    this.divRef = ref;
     this.updateCanvasSize();
+  };
+
+  private handleStageRef = (stage: Stage) => {
+    if (!stage) return;
+    this.stageRef = stage;
   };
 
   private handleKeyboard = (e: KeyboardEvent) => {
@@ -70,7 +85,7 @@ export class PatternRenderer extends React.Component<Props, State> {
   };
 
   private updateCanvasSize() {
-    const parent = this.ref.parentNode as HTMLElement;
+    const parent = this.divRef.parentNode as HTMLElement;
     this.setState({
       width: parent.offsetWidth,
       height: parent.offsetHeight,
@@ -78,19 +93,19 @@ export class PatternRenderer extends React.Component<Props, State> {
   }
 
   private handleResize = () => {
-    if (!this.ref) return;
+    if (!this.divRef) return;
     this.updateCanvasSize();
   };
 
   public render() {
     return (
-      <div ref={this.handleRef}>
-        <Stage width={this.state.width} height={this.state.height}>
+      <div ref={this.handleDivRef}>
+        <Stage width={this.state.width} height={this.state.height} ref={this.handleStageRef}>
           <Layer x={this.state.width / 2} y={this.state.height / 2}>
             {this.props.partManagerStore.activePartStore ? (
               <PatternGroup
                 partStore={this.props.partManagerStore.activePartStore}
-                scale={(Math.min(this.state.width, this.state.height) / this.props.partManagerStore.getMaxSize()) * 0.8}
+                maxSize={Math.min(this.state.width, this.state.height) * 0.8}
               />
             ) : null}
           </Layer>

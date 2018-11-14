@@ -61,6 +61,12 @@ const dependencies = [
     to: `${md5('three' + now)}.js`,
     module: 'three',
     global: 'THREE'
+  },
+  {
+    from: 'node_modules/file-saver/dist/FileSaver.min.js',
+    to: `${md5('file-saver' + now)}.js`,
+    module: 'file-saver',
+    global: 'FileSaver'
   }
 ];
 const rules = [

@@ -1,43 +1,34 @@
+import { inject, observer } from 'mobx-react';
 import * as React from 'react';
+import { compose } from 'recompose';
+import { ApplicationStore, Tab } from '../../stores/ApplicationStore';
 import { SegmentedControl } from '../widget/SegmentedControl';
 import { ModelRenderer } from './ModelRenderer';
 import { PatternRenderer } from './PatternRenderer';
 import './styles/Editor.pcss';
 
-enum Tab {
-  model,
-  pattern,
-}
-
-const TabList = [Tab.model, Tab.pattern];
-
-type State = {
-  tab: Tab;
+type Props = {
+  applicationStore?: ApplicationStore;
 };
 
-export class Editor extends React.Component<{}, State> {
-  public state = {
-    tab: Tab.model,
-  };
+export const Editor = compose<Props, Props>(
+  inject('applicationStore'),
+  observer,
+)(({ applicationStore }) => {
+  const handleClickItem = (i: number) => applicationStore.setTabIndex(i);
 
-  private handleClickItem = (i: number) => {
-    this.setState({ tab: TabList[i] });
-  };
-
-  public render() {
-    return (
-      <div styleName="base">
-        {this.state.tab === Tab.model ? <ModelRenderer /> : null}
-        {this.state.tab === Tab.pattern ? <PatternRenderer /> : null}
-        <h1 styleName="logo">fur</h1>
-        <div styleName="display-switch">
-          <SegmentedControl
-            items={['Model', 'Pattern']}
-            selectedIndex={TabList.indexOf(this.state.tab)}
-            onClickItem={this.handleClickItem}
-          />
-        </div>
+  return (
+    <div styleName="base">
+      {applicationStore.tab === Tab.model ? <ModelRenderer /> : null}
+      {applicationStore.tab === Tab.pattern ? <PatternRenderer /> : null}
+      <h1 styleName="logo">fur</h1>
+      <div styleName="display-switch">
+        <SegmentedControl
+          items={['Model', 'Pattern']}
+          selectedIndex={applicationStore.selectedTabIndex}
+          onClickItem={handleClickItem}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
