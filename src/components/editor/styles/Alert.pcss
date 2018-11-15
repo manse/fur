@@ -1,12 +1,39 @@
 .base {
-  border-radius: 99em;
-  padding: 10px 20px;
   position: absolute;
   top: 20px;
-  left: 50%;
-  transform: translate(-50%, 0);
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  font-size: 40px;
+  transform: translate(0, 5px);
+}
+
+.message {
+  border-radius: 8px;
+  padding: 10px 20px;
   background: yellow;
   color: $colorBackground;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
+  margin-left: 20px;
+  position: relative;
+
+  &:after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -6px;
+    border: 6px solid transparent;
+    border-right-color: yellow;
+  }
 }

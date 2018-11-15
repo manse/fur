@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { times } from 'ramda';
 import * as THREE from 'three';
 import { EdgeStore } from './EdgeStore';
@@ -48,6 +48,9 @@ class Plate {
   public readonly id = Math.floor(Math.random() * 1e12).toString(36);
   @observable
   public key = Math.random();
+  @observable
+  public isRoot = false;
+  @observable
   public parentPlates: Plate[] = [];
   public anchors: Anchor[];
   public geometry: THREE.Geometry;
@@ -62,6 +65,11 @@ class Plate {
     this.face = new THREE.Face3(0, 1, 2);
     this.geometry.faces.push(this.face);
     this.updateNormals();
+  }
+
+  @computed
+  public get error() {
+    return !this.isRoot && !this.parentPlates.length;
   }
 
   public getCenter() {
@@ -133,6 +141,7 @@ export class SimulationStore {
     this.plates = this.fragmentStores.map(
       fragment => new Plate(fragment, new Anchor(fragment.v0), new Anchor(fragment.v1), new Anchor(fragment.v2)),
     );
+    this.plates[0].isRoot = true;
     this.constraints = [];
     this.buildEdgeLengthConstraint();
     this.buildVerticesDistanceConstraint();

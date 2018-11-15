@@ -30,7 +30,7 @@ export const PatternGroup = compose<Props, Props>(
         return (
           <Line
             key={plate.key}
-            fill={toRGBA(partStore.color, 0.4)}
+            fill={toRGBA(plate.error ? '#ffff00' : partStore.color, 0.4)}
             points={[
               plate.a0.vector.x,
               plate.a0.vector.y,

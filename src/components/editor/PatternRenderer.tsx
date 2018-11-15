@@ -23,7 +23,7 @@ type State = {
 
 const warningMessages = {
   [WarningType.blank]: '面が追加されていません',
-  [WarningType.divided]: 'いくつかの面が離れています',
+  [WarningType.divided]: 'いくつかの面が離れています（離れている面を黄色で表しました）',
 };
 
 @inject('modelStore', 'partManagerStore')
