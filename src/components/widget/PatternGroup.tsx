@@ -20,7 +20,6 @@ export const PatternGroup = compose<Props, Props>(
   const dx = bounding.max.x - bounding.min.x;
   const dy = bounding.max.y - bounding.min.y;
   const scaleXY = size ? size / Math.max(dx, dy) : maxSize / partManagerStore.getMaxSize() || 100;
-
   return (
     <Group
       scale={{ x: scaleXY, y: scaleXY }}

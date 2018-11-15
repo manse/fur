@@ -7,7 +7,6 @@ const partManagerStore = new PartManagerStore();
 const modelStore = new ModelStore();
 const applicationStore = new ApplicationStore();
 modelStore.loadModelFromObjString(sampleObj);
-partManagerStore.addPartStore();
 
 export default {
   applicationStore,

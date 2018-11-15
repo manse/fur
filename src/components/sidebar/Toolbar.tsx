@@ -13,18 +13,21 @@ type Props = {
 };
 
 export const Toolbar = compose<Props, Props>(
-  inject('partManagerStore', 'applicationStore'),
+  inject('partManagerStore', 'applicationStore', 'modelStore'),
   observer,
 )(({ partManagerStore, modelStore, applicationStore }) => {
   const handleOpen = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.txt, text/plain';
+    input.accept = '.obj';
     input.onchange = event => {
       const file = (event.target as any).files[0];
       const reader = new FileReader();
       reader.readAsText(file);
-      reader.onload = () => modelStore.loadModelFromObjString(reader.result.toString());
+      reader.onload = () => {
+        modelStore.loadModelFromObjString(reader.result.toString());
+        partManagerStore.clear();
+      };
     };
     input.click();
   };

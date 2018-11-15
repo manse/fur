@@ -11,9 +11,14 @@ export class PartManagerStore {
   @observable
   public downloadKey = Math.random();
 
+  constructor() {
+    this.clear();
+  }
+
   @action
   public clear() {
     this.partStores = [];
+    this.addPartStore();
   }
 
   @action
