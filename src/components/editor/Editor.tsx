@@ -24,7 +24,7 @@ export const Editor = compose<Props, Props>(
       <h1 styleName="logo">fur</h1>
       <div styleName="display-switch">
         <SegmentedControl
-          items={['Model', 'Pattern']}
+          items={['モデル', 'パターン']}
           selectedIndex={applicationStore.selectedTabIndex}
           onClickItem={handleClickItem}
         />

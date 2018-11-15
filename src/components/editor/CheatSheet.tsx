@@ -9,23 +9,23 @@ export const ModelCheatSheet = ({ controller }: { controller: BaseController }) 
   <div styleName="base">
     <dl styleName={controller instanceof DefaultController ? 'active' : ''}>
       <dt>Click</dt>
-      <dd>Move or zoom in/out camera</dd>
+      <dd>視点の移動</dd>
     </dl>
     <dl styleName={controller instanceof FragmentController ? 'active' : ''}>
       <dt>Shift + Click</dt>
-      <dd>Pick or unpick fragment</dd>
+      <dd>面の追加・削除</dd>
     </dl>
     <dl styleName={controller instanceof AddMultiFragmentController ? 'active' : ''}>
       <dt>Shift + A + Click</dt>
-      <dd>Pick multiple fragment</dd>
+      <dd>面をまとめて追加</dd>
     </dl>
     <dl styleName={controller instanceof RemoveMultiFragmentController ? 'active' : ''}>
       <dt>Shift + Z + Click</dt>
-      <dd>Unpick multiple fragment</dd>
+      <dd>面をまとめて削除</dd>
     </dl>
     <dl styleName={controller instanceof EdgeController ? 'active' : ''}>
       <dt>Command + Click</dt>
-      <dd>Pick or unpick darts</dd>
+      <dd>ダーツの追加・削除</dd>
     </dl>
   </div>
 );
@@ -34,7 +34,7 @@ export const PatternCheatSheet = ({ shift }: { shift: boolean }) => (
   <div styleName="base">
     <dl styleName={shift ? 'active' : ''}>
       <dt>Shift</dt>
-      <dd>Iterate simulation</dd>
+      <dd>フラット化を進める</dd>
     </dl>
   </div>
 );
