@@ -5,6 +5,12 @@ import { EdgeStore } from './EdgeStore';
 import { FragmentStore } from './FragmentStore';
 import { VertexStore } from './VertexStore';
 
+export enum WarningType {
+  ok,
+  blank,
+  divided,
+}
+
 function noop() {}
 
 class Constraint {
@@ -111,6 +117,8 @@ export class SimulationStore {
   @observable
   public plates: Plate[] = [];
   @observable
+  public warningType: WarningType = WarningType.blank;
+  @observable
   public key = Math.random();
   private constraints: Constraint[];
 
@@ -118,7 +126,10 @@ export class SimulationStore {
 
   @action
   public reset() {
-    if (!this.fragmentStores.length) return;
+    if (!this.fragmentStores.length) {
+      this.warningType = WarningType.blank;
+      return;
+    }
     this.plates = this.fragmentStores.map(
       fragment => new Plate(fragment, new Anchor(fragment.v0), new Anchor(fragment.v1), new Anchor(fragment.v2)),
     );
@@ -127,6 +138,8 @@ export class SimulationStore {
     this.buildVerticesDistanceConstraint();
     this.buildPlateRelation();
     this.resetAttitude();
+    this.warningType =
+      this.plates.filter(plate => !plate.parentPlates.length).length > 1 ? WarningType.divided : WarningType.ok;
   }
 
   @action

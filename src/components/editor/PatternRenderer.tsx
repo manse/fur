@@ -5,7 +5,9 @@ import * as React from 'react';
 import { Layer, Stage } from 'react-konva';
 import { ModelStore } from '../../stores/ModelStore';
 import { PartManagerStore } from '../../stores/PartManagerStore';
+import { WarningType } from '../../stores/SimulationStore';
 import { PatternGroup } from '../widget/PatternGroup';
+import { Alert } from './Alert';
 import { PatternCheatSheet } from './CheatSheet';
 
 type Props = {
@@ -17,6 +19,11 @@ type State = {
   width: number;
   height: number;
   shift: boolean;
+};
+
+const warningMessages = {
+  [WarningType.blank]: '面が追加されていません',
+  [WarningType.divided]: 'いくつかの面が離れています',
 };
 
 @inject('modelStore', 'partManagerStore')
@@ -110,6 +117,13 @@ export class PatternRenderer extends React.Component<Props, State> {
           </Layer>
         </Stage>
         <PatternCheatSheet shift={this.state.shift} />
+        {this.props.partManagerStore.activePartStore ? (
+          <Alert
+            message={
+              (warningMessages as any)[this.props.partManagerStore.activePartStore.simulationStore.warningType || '']
+            }
+          />
+        ) : null}
       </div>
     );
   }
