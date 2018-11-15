@@ -26,9 +26,7 @@ export class PartManagerStore {
     const partStore = new PartStore();
     partStore.color = getPartColor(this.partStores.length * 0.45);
     this.partStores.push(partStore);
-    if (this.partStores.length === 1) {
-      this.activePartStore = partStore;
-    }
+    this.activePartStore = partStore;
   }
 
   @action
