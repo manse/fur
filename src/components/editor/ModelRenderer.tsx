@@ -11,7 +11,11 @@ import { BaseController } from './controllers/BaseController';
 import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
-import { AddMultiFragmentController, BaseMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
+import {
+  AddMultiFragmentController,
+  BaseMultiFragmentController,
+  RemoveMultiFragmentController,
+} from './controllers/MultiFragmentController';
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';

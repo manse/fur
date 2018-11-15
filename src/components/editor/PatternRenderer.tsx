@@ -72,12 +72,11 @@ export class PatternRenderer extends React.Component<Props, State> {
 
   private handleKeyboard = (e: KeyboardEvent) => {
     clearInterval(this.timerId);
-    if (e.shiftKey) {
-      this.timerId = window.setInterval(() => {
-        const partStore = this.props.partManagerStore.activePartStore;
-        if (!partStore) return;
-        partStore.simulationStore.iterate();
-      }, 5);
+    const partStore = this.props.partManagerStore.activePartStore;
+    if (partStore) {
+      if (e.shiftKey) {
+        this.timerId = window.setInterval(() => partStore.simulationStore.iterate(), 5);
+      }
     }
     this.setState({
       shift: e.shiftKey,
