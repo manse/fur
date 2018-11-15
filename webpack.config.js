@@ -183,7 +183,7 @@ module.exports = () => ({
       filename: prod ? `${md5('style' + now)}.css` : '[name].css'
     }),
     new HtmlWebpackIncludeAssetsPlugin({
-      assets: [...dependencies.map(({ to }) => to), ...(prod ? [`${md5(now)}.css`] : [])],
+      assets: [...dependencies.map(({ to }) => to)],
       append: false
     }),
     new OptimizeCSSAssetsPlugin({}),
