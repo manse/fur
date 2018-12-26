@@ -167,6 +167,7 @@ module.exports = () => ({
   performance: { hints: false },
   devServer: {
     open: true,
+    host: '0.0.0.0',
     contentBase: 'public',
     overlay: true,
     hot: true
