@@ -9,6 +9,8 @@ type ControllerType = 'default' | 'fragment' | 'addMultiFragment' | 'removeMulti
 
 type Props = { controller: BaseController; onClickController: (controller: ControllerType) => void };
 
+const METAKEY_LABEL = navigator.userAgent.indexOf('Macintosh') !== -1 ? 'Command' : 'Ctrl';
+
 export const ModelCheatSheet = ({ controller, onClickController }: Props) => {
   const handleClickDefault = () => onClickController('default');
   const handleClickFragment = () => onClickController('fragment');
@@ -40,7 +42,7 @@ export const ModelCheatSheet = ({ controller, onClickController }: Props) => {
         <dd>面をまとめて削除</dd>
       </dl>
       <dl styleName={controller instanceof EdgeController ? 'active' : ''} onClick={handleClickEdge}>
-        <dt>Command + Click</dt>
+        <dt>{METAKEY_LABEL} + Click</dt>
         <dd>ダーツの追加・削除</dd>
       </dl>
     </div>
