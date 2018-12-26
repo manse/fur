@@ -19,6 +19,7 @@ import {
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';
+import './styles/ModelRenderer.pcss';
 
 type Props = {
   modelStore?: ModelStore;
@@ -100,6 +101,49 @@ export class ModelRenderer extends React.Component<Props, State> {
     }
   }
 
+  private handleClickController = (type: string) => {
+    switch (type) {
+      case 'default':
+        this.keyConfig = {
+          shift: false,
+          ctrl: false,
+          key: '',
+        };
+        break;
+      case 'fragment':
+        this.keyConfig = {
+          shift: true,
+          ctrl: false,
+          key: '',
+        };
+        break;
+      case 'addMultiFragment':
+        this.keyConfig = {
+          shift: true,
+          ctrl: false,
+          key: 'A',
+        };
+        break;
+      case 'removeMultiFragment':
+        this.keyConfig = {
+          shift: true,
+          ctrl: false,
+          key: 'Z',
+        };
+        break;
+      case 'edge':
+        this.keyConfig = {
+          shift: false,
+          ctrl: true,
+          key: '',
+        };
+        break;
+      default:
+        return;
+    }
+    this.updateController();
+  };
+
   private handleResize = () => {
     if (!this.ref) return;
     this.updateCanvasSize();
@@ -126,7 +170,7 @@ export class ModelRenderer extends React.Component<Props, State> {
     }
   };
 
-  private handleMousewheel = (e: MouseWheelEvent) => {
+  private handleMousewheel = (e: any) => {
     this.controller.scroll(e.wheelDelta);
   };
 
@@ -138,7 +182,7 @@ export class ModelRenderer extends React.Component<Props, State> {
       end(this.transformPointToProjection(e));
       window.removeEventListener('mousemove', mousemove);
       window.removeEventListener('mouseup', mouseup);
-      this.updateController();
+      requestAnimationFrame(() => this.updateController());
       this.dragging = false;
     };
     window.addEventListener('mousemove', mousemove);
@@ -219,16 +263,22 @@ export class ModelRenderer extends React.Component<Props, State> {
     }
 
     return (
-      <div ref={this.handleRef}>
-        <ModelCheatSheet controller={this.controller} key={this.state.controllerId} />
-        <Stage width={this.state.width} height={this.state.height}>
-          <Layer x={this.state.width / 2} y={this.state.height / 2}>
-            {fragments}
-            {edges}
-            {helper}
-          </Layer>
-        </Stage>
-      </div>
+      <React.Fragment>
+        <ModelCheatSheet
+          controller={this.controller}
+          key={this.state.controllerId}
+          onClickController={this.handleClickController}
+        />
+        <div ref={this.handleRef} styleName="canvas">
+          <Stage width={this.state.width} height={this.state.height}>
+            <Layer x={this.state.width / 2} y={this.state.height / 2}>
+              {fragments}
+              {edges}
+              {helper}
+            </Layer>
+          </Stage>
+        </div>
+      </React.Fragment>
     );
   }
 }
