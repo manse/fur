@@ -3,9 +3,10 @@ import { DefaultController } from './controllers/DefaultController';
 import { EdgeController } from './controllers/EdgeController';
 import { FragmentController } from './controllers/FragmentController';
 import { AddMultiFragmentController, RemoveMultiFragmentController } from './controllers/MultiFragmentController';
+import { ZoomController } from './controllers/ZoomController';
 import './styles/CheatSheet.pcss';
 
-type ControllerType = 'default' | 'fragment' | 'addMultiFragment' | 'removeMultiFragment' | 'edge';
+type ControllerType = 'default' | 'fragment' | 'addMultiFragment' | 'removeMultiFragment' | 'edge' | 'zoom';
 
 type Props = { controller: BaseController; onClickController: (controller: ControllerType) => void };
 
@@ -16,12 +17,17 @@ export const ModelCheatSheet = ({ controller, onClickController }: Props) => {
   const handleClickFragment = () => onClickController('fragment');
   const handleClickAddMultiFragment = () => onClickController('addMultiFragment');
   const handleClickRemoveMultiFragment = () => onClickController('removeMultiFragment');
+  const handleClickZoom = () => onClickController('zoom');
   const handleClickEdge = () => onClickController('edge');
   return (
     <div styleName="base">
       <dl styleName={controller instanceof DefaultController ? 'active' : ''} onClick={handleClickDefault}>
         <dt>Click</dt>
         <dd>視点の移動</dd>
+      </dl>
+      <dl styleName={controller instanceof ZoomController ? 'active' : ''} onClick={handleClickZoom}>
+        <dt>S + Click</dt>
+        <dd>ズームイン・アウト</dd>
       </dl>
       <dl styleName={controller instanceof FragmentController ? 'active' : ''} onClick={handleClickFragment}>
         <dt>Shift + Click</dt>

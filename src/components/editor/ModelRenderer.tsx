@@ -16,6 +16,7 @@ import {
   BaseMultiFragmentController,
   RemoveMultiFragmentController,
 } from './controllers/MultiFragmentController';
+import { ZoomController } from './controllers/ZoomController';
 import { EdgeHelper } from './helpers/EdgeHelper';
 import { FragmentHelper } from './helpers/FragmentHelper';
 import { MultiFragmentHelper } from './helpers/MultiFragmentHelper';
@@ -56,6 +57,7 @@ export class ModelRenderer extends React.Component<Props, State> {
   private fragmentController = new FragmentController(this.stores);
   private addMultiFragmentController = new AddMultiFragmentController(this.stores);
   private removeMultiFragmentController = new RemoveMultiFragmentController(this.stores);
+  private zoomController = new ZoomController(this.stores);
   private controller: BaseController = this.defaultController;
 
   public componentDidMount() {
@@ -86,6 +88,8 @@ export class ModelRenderer extends React.Component<Props, State> {
       controller = this.addMultiFragmentController;
     } else if (this.keyConfig.key === 'Z') {
       controller = this.removeMultiFragmentController;
+    } else if (this.keyConfig.key === 'S') {
+      controller = this.zoomController;
     } else if (this.keyConfig.shift) {
       controller = this.fragmentController;
     } else if (this.keyConfig.ctrl) {
@@ -136,6 +140,13 @@ export class ModelRenderer extends React.Component<Props, State> {
           shift: false,
           ctrl: true,
           key: '',
+        };
+        break;
+      case 'zoom':
+        this.keyConfig = {
+          shift: false,
+          ctrl: false,
+          key: 'S',
         };
         break;
       default:
