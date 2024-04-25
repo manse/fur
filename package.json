@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "prod": "webpack --mode production",
-    "dev": "webpack-dev-server --hot --inline",
+    "prod": "NODE_OPTIONS='--openssl-legacy-provider' webpack --mode production",
+    "dev": "NODE_OPTIONS='--openssl-legacy-provider' webpack-dev-server --hot --inline",
     "deploy": "sh ./scripts/deploy.sh"
   },
   "author": "manse",

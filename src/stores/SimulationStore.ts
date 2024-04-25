@@ -17,8 +17,8 @@ class Constraint {
   constructor(public a0: Anchor, public a1: Anchor, private distance: number, private factor: number) {}
 
   public apply() {
-    this.a0.vector.z *= 0.999;
-    this.a1.vector.z *= 0.999;
+    this.a0.vector.z *= 0.995;
+    this.a1.vector.z *= 0.995;
     const diff = new THREE.Vector3(
       this.a0.vector.x - this.a1.vector.x,
       this.a0.vector.y - this.a1.vector.y,
@@ -158,8 +158,8 @@ export class SimulationStore {
       this.resetAttitude();
       this.plates.forEach(plate => plate.updateNormals());
       this.plates.map(plate => plate.generateRotationPatch()).forEach(fn => fn());
-      times(() => this.constraints.forEach(constraint => constraint.apply()), 50);
-    }, 5);
+      times(() => this.constraints.forEach(constraint => constraint.apply()), 100);
+    }, 10);
     this.invalidate();
   }
 
@@ -210,9 +210,9 @@ export class SimulationStore {
   private buildEdgeLengthConstraint() {
     this.plates.forEach(({ a0, a1, a2 }) => {
       this.constraints.push(
-        new Constraint(a0, a1, a0.vertexStore.length(a1.vertexStore), 0.1),
-        new Constraint(a1, a2, a1.vertexStore.length(a2.vertexStore), 0.1),
-        new Constraint(a2, a0, a2.vertexStore.length(a0.vertexStore), 0.1),
+        new Constraint(a0, a1, a0.vertexStore.length(a1.vertexStore), 0.2),
+        new Constraint(a1, a2, a1.vertexStore.length(a2.vertexStore), 0.2),
+        new Constraint(a2, a0, a2.vertexStore.length(a0.vertexStore), 0.2),
       );
     });
   }
@@ -234,7 +234,7 @@ export class SimulationStore {
           .forEach(([a, b]) => this.constraints.push(new Constraint(a, b, 0, 1)));
         const ra0 = fromPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
         const ra1 = toPlate.getRestAnchor(pairs[0][0], pairs[1][0]);
-        this.constraints.push(new Constraint(ra0, ra1, ra0.vertexStore.length(ra1.vertexStore), 0.1));
+        this.constraints.push(new Constraint(ra0, ra1, ra0.vertexStore.length(ra1.vertexStore), 0.2));
         if (visited.includes(toFragment)) return;
         visited.push(toFragment);
         dig(toFragment);
